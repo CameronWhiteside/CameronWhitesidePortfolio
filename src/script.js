@@ -15,9 +15,9 @@ debugObject.createSphere = () =>
     createSphere(
         Math.random() * 0.5,
         {
-            x: (Math.random() - 0.5) * 3,
+            x: 0,
             y: 3,
-            z: (Math.random() - 0.5) * 3
+            z: 0
         }
     )
 }
@@ -27,13 +27,13 @@ gui.add(debugObject, 'createSphere')
 debugObject.createBox = () =>
 {
     createBox(
-        Math.random(),
-        Math.random(),
-        Math.random(),
+        Math.random() * 5,
+        Math.random() * 5,
+        Math.random() * 5,
         {
-            x: (Math.random() - 0.5) * 3,
+            x: (Math.random() - 0.5) * 0.13,
             y: 3,
-            z: (Math.random() - 0.5) * 3
+            z: (Math.random() - 0.5) * .13
         }
     )
 }
@@ -51,7 +51,7 @@ debugObject.reset = () =>
         // Remove mesh
         scene.remove(object.mesh)
     }
-    
+
     objectsToUpdate.splice(0, objectsToUpdate.length)
 }
 gui.add(debugObject, 'reset')
@@ -103,7 +103,7 @@ const environmentMapTexture = cubeTextureLoader.load([
 const world = new CANNON.World()
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
-world.gravity.set(0, - 9.82, 0)
+world.gravity.set(0, -12, 0)
 
 // Default material
 const defaultMaterial = new CANNON.Material('default')
@@ -112,7 +112,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.7
+        restitution: 0.4
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -122,8 +122,42 @@ const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
 floorBody.mass = 0
 floorBody.addShape(floorShape)
-floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5) 
-world.addBody(floorBody)
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
+
+// const northWallBody = new CANNON.Body()
+// northWallBody.mass = 0
+// northWallBody.addShape(floorShape)
+// northWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0))
+// northWallBody.position = new CANNON.Vec3(0, 10, 10)
+
+// const southWallBody = new CANNON.Body()
+// southWallBody.mass = 0
+// southWallBody.addShape(floorShape)
+// southWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0))
+// southWallBody.position = new CANNON.Vec3(0, -10, -10)
+
+// const eastWallBody = new CANNON.Body()
+// eastWallBody.mass = 0
+// eastWallBody.addShape(floorShape)
+// eastWallBody.position = new CANNON.Vec3(0, 10,10)
+// eastWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), Math.PI * 0.5)
+
+// const westWallBody = new CANNON.Body()
+// westWallBody.mass = 0
+// westWallBody.addShape(floorShape)
+// westWallBody.position = new CANNON.Vec3(0, -10, -10)
+// westWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), Math.PI * 0.5)
+
+
+
+
+// world.addBody(southWallBody)
+// world.addBody(northWallBody)
+// world.addBody(eastWallBody)
+// world.addBody(westWallBody)
+// world.addBody(floorBody)
+
+
 
 /**
  * Utils
@@ -135,8 +169,8 @@ const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
 const sphereMaterial = new THREE.MeshStandardMaterial({
     metalness: 0.3,
     roughness: 0.4,
-    envMap: environmentMapTexture,
-    envMapIntensity: 0.5
+    // envMap: environmentMapTexture,
+    // envMapIntensity: 0.5
 })
 
 const createSphere = (radius, position) =>
@@ -170,10 +204,10 @@ const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
     metalness: 0.3,
     roughness: 0.4,
-    envMap: environmentMapTexture,
-    envMapIntensity: 0.5
+    // envMap: environmentMapTexture,
+    // envMapIntensity: 0.5
 })
-const createBox = (width, height, depth, position) =>
+const createBox = (width, height, depth, position, mass = 1) =>
 {
     // Three.js mesh
     const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
@@ -186,8 +220,7 @@ const createBox = (width, height, depth, position) =>
     const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
 
     const body = new CANNON.Body({
-        mass: 1,
-        position: new CANNON.Vec3(0, 3, 0),
+        mass,
         shape: shape,
         material: defaultMaterial
     })
@@ -199,24 +232,46 @@ const createBox = (width, height, depth, position) =>
     objectsToUpdate.push({ mesh, body })
 }
 
+
+// createBox(3, 20, 20, {x: -10, y: 10, z:0}, 0)
+// createBox(20, 20, .1, {x: 0, y: 10, z:10}, 0)
+// createBox(.1, 20, 20, {x: 10, y: 10, z:0}, 0)
+createBox(20, 1000, 20, {x: 0, y: -500, z:0}, 0)
+// createBox(20, 20, .1, {x: 0, y: 10, z:-10}, 0)
+// createBox(20, .1, 20, {x: 0, y: 20, z:0}, 0)
+
 createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
 
 /**
  * Floor
  */
+const wallGeometry = new THREE.PlaneGeometry(20,20)
+const wallMaterial = new THREE.MeshStandardMaterial({
+    color: '#ffcc22',
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+    envMapIntensity: 0.5
+})
+
+
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshStandardMaterial({
-        color: '#777777',
-        metalness: 0.3,
-        roughness: 0.4,
-        envMap: environmentMapTexture,
-        envMapIntensity: 0.5
-    })
+    wallGeometry, wallMaterial
 )
-floor.receiveShadow = true
-floor.rotation.x = - Math.PI * 0.5
-scene.add(floor)
+
+// floor.receiveShadow = true
+// floor.rotation.x = - Math.PI * 0.5
+// scene.add(floor)
+
+// const northWall = new THREE.Mesh(
+//     wallGeometry, wallMaterial
+// )
+
+// northWall.receiveShadow = true
+// northWall.position.z = -10;
+// northWall.position.y = 10;
+// // northWall.rotation.x = - Math.PI * 0.5
+// scene.add(northWall)
 
 /**
  * Lights
@@ -263,7 +318,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(- 3, 3, 3)
+camera.position.set(5, 10, 5)
 scene.add(camera)
 
 // Controls
@@ -295,7 +350,7 @@ const tick = () =>
 
     // Update physics
     world.step(1 / 60, deltaTime, 3)
-    
+
     for(const object of objectsToUpdate)
     {
         object.mesh.position.copy(object.body.position)
