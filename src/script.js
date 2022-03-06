@@ -110,15 +110,20 @@ const playHitSound = (collision) =>
  */
 const textureLoader = new THREE.TextureLoader()
 const yellowTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
-const nameTexture = textureLoader.load('textures/matcaps/cheese.png')
+const cheeseTexture = textureLoader.load('textures/matcaps/cheese.png')
+const pinkTexture = textureLoader.load('textures/matcaps/pink.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const yellowMaterial = new THREE.MeshMatcapMaterial({
     matcap: yellowTexture
 })
 const nameMaterial = new THREE.MeshMatcapMaterial({
-    matcap: nameTexture
+    matcap: cheeseTexture
 })
+const pinkMaterial = new THREE.MeshMatcapMaterial({
+    matcap: pinkTexture
+})
+
 
 
 
@@ -255,6 +260,22 @@ gltfLoader.load(
         // const nameBox = new CANNON.Body()
     }
 )
+
+gltfLoader.load(
+    '/models/extruded-tech-stack-ring.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let techStack = gltf.scene.children[0]
+        techStack.scale.set(300, 300, 300)
+        techStack.position.set(0, -10, -20)
+        techStack.material = nameMaterial
+        scene.add(techStack)
+        console.log(scene)
+    }
+)
+
+
 
 
 const resumeScale = [8.5 / 2.5, 11/ 2.5, 0.1]
