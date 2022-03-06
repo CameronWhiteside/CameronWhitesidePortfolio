@@ -420,20 +420,20 @@ window.addEventListener('click', () => {
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
             const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
-            const height = 11 * 1.8
-            const width = 8.5 * 1.8
+            const height = 11 * 1.2
+            const width = 8.5 * 1.2
             const depth = 0.1
 
             largeResume.scale.set(width, height, depth)
 
             const position = {
                 x: 0,
-                y: 1,
-                z: 10.1
+                y: 3.5,
+                z: 13
             }
 
             const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
+            quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/15)
             largeResume.quaternion.copy(quaternion)
             largeResume.position.copy(position)
 
@@ -453,7 +453,7 @@ window.addEventListener('click', () => {
             world.addBody(resumeBody)
             cannonObjects.push({ mesh: largeResume, body: resumeBody })
             // raycasterObjects.push(largeResume)
-        } 
+        }
     } else {
             console.log(`test`)
             if (focusedObject) {
