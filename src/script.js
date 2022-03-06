@@ -14,6 +14,10 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
  */
 const gui = new dat.GUI()
 const debugObject = {}
+const raycasterObjects = []
+const cannonObjects = []
+let focusedObject, currentIntersect
+
 
 // debugObject.createSphere = () =>
 // {
@@ -50,7 +54,7 @@ gui.add(debugObject, 'createResume')
 // Reset
 debugObject.reset = () =>
 {
-    for(const object of objectsToUpdate)
+    for(const object of cannonObjects)
     {
         // Remove body
         object.body.removeEventListener('collide', playHitSound)
@@ -59,7 +63,7 @@ debugObject.reset = () =>
         scene.remove(object.mesh)
     }
 
-    objectsToUpdate.splice(0, objectsToUpdate.length)
+    cannonObjects.splice(0, cannonObjects.length)
 }
 gui.add(debugObject, 'reset')
 
@@ -81,7 +85,6 @@ dracoLoader.setDecoderPath('/draco/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
-let mixer = null
 
 
 
@@ -116,42 +119,8 @@ const yellowMaterial = new THREE.MeshMatcapMaterial({
 const nameMaterial = new THREE.MeshMatcapMaterial({
     matcap: nameTexture
 })
-const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
 
-// const fontLoader = new FontLoader()
-
-// fontLoader.load(
-//     '/fonts/CHEDROS_Regular.json',
-//     (font) => {
-//         // Material
-//         const material = new THREE.MeshMatcapMaterial({ matcap: yellowTexture })
-
-//         // Text
-//         const textGeometry = new TextGeometry(
-//             'CAMERON',
-//             {
-//                 font: font,
-//                 size: 4,
-//                 height: 1,
-//                 curveSegments: 12,
-//                 bevelEnabled: true,
-//                 bevelThickness: 0.03,
-//                 bevelSize: 0.02,
-//                 bevelOffset: 0,
-//                 bevelSegments: 10
-//             }
-
-
-//             )
-//             // textGeometry.position.x = 20
-//             console.log(textGeometry)
-//             textGeometry.center()
-
-//         const text = new THREE.Mesh(textGeometry, material)
-//         scene.add(text)
-//     }
-// )
 
 /**
  * Physics
@@ -168,7 +137,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.12
+        restitution: 0.02
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -184,7 +153,7 @@ floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
 /**
  * Utils
  */
-const objectsToUpdate = []
+
 
 // Create sphere
 // const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
@@ -218,7 +187,7 @@ const objectsToUpdate = []
 //     world.addBody(body)
 
 //     // Save in objects
-//     objectsToUpdate.push({ mesh, body })
+//     cannonObjects.push({ mesh, body })
 // }
 
 // Create box
@@ -257,7 +226,7 @@ gltfLoader.load(
         let text = children[0]
         console.log(text)
         text.scale.set(4.5, 4.5, 4.5)
-        text.position.set(0, 3, 0)
+        text.position.set(0, 2.9, 0)
         text.material = nameMaterial
         scene.add(text)
 
@@ -281,22 +250,24 @@ gltfLoader.load(
 
         textBody.position.copy(position)
         world.addBody(textBody)
-        // objectsToUpdate.push({ mesh: text, body: textBody })
+        // cannonObjects.push({ mesh: text, body: textBody })
         // console.log(text)
         // const nameBox = new CANNON.Body()
     }
 )
 
 
+const resumeScale = [8.5 / 2.5, 11/ 2.5, 0.1]
 
 const createResume = () => {
 
+    const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
     const resume = new THREE.Mesh(boxGeometry, resumeMaterial)
     const height = 11/2.5
     const width = 8.5/2.5
     const depth = 0.1
 
-    resume.scale.set(width, height, depth)
+    resume.scale.set(...resumeScale)
     // resumeMesh.castShadow = true
     const position =   {
                     x: (Math.random() - 0.5) * 10,
@@ -313,7 +284,6 @@ const createResume = () => {
     resume.position.copy(position)
 
     const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-    const resumePlane = new CANNON.Plane(new CANNON.Vec3(width * 0.5, height * 0.5))
 
     const resumeBody = new CANNON.Body({
         mass: 1,
@@ -327,7 +297,8 @@ const createResume = () => {
 
     scene.add(resume)
     world.addBody(resumeBody)
-    objectsToUpdate.push({ mesh: resume, body: resumeBody })
+    cannonObjects.push({ mesh: resume, body: resumeBody })
+    raycasterObjects.push(resume)
 
 }
 
@@ -354,7 +325,7 @@ const createBox = (width, height, depth, position, mass = 1, material = yellowMa
     world.addBody(body)
 
     // Save in objects
-    objectsToUpdate.push({ mesh, body })
+    cannonObjects.push({ mesh, body })
 }
 
 
@@ -423,12 +394,79 @@ const cursor = {
     y: 0
 }
 
+const raycaster = new THREE.Raycaster()
+const mouse = new THREE.Vector2()
+
+
 window.addEventListener('mousemove', (event) =>
 {
     cursor.x = event.clientX / sizes.width - 0.5
     cursor.y = event.clientY / sizes.height - 0.5
-
+    mouse.x = event.clientX / sizes.width * 2 - 1
+    mouse.y = - event.clientY / sizes.height * 2 + 1
 })
+
+
+window.addEventListener('click', () => {
+    if (currentIntersect) {
+        let object = currentIntersect.object;
+
+        const material = object.material.clone()
+        const geometry = object.geometry.clone()
+        const scale = object.scale.clone()
+        const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
+        console.log(scale, resumeScale)
+        console.log(scale.x, resumeScale[0])
+
+        if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
+            const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
+            const height = 11 * 1.8
+            const width = 8.5 * 1.8
+            const depth = 0.1
+
+            largeResume.scale.set(width, height, depth)
+
+            const position = {
+                x: 0,
+                y: 1,
+                z: 10.1
+            }
+
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
+            largeResume.quaternion.copy(quaternion)
+            largeResume.position.copy(position)
+
+            const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+            const resumeBody = new CANNON.Body({
+                mass: 0,
+                shape: resumeShape,
+                material: defaultMaterial
+            })
+
+            resumeBody.position.copy(position)
+            resumeBody.quaternion.copy(quaternion)
+            resumeBody.addEventListener('collide', playHitSound)
+
+            scene.add(largeResume)
+            focusedObject = { mesh: largeResume, body: resumeBody }
+            world.addBody(resumeBody)
+            cannonObjects.push({ mesh: largeResume, body: resumeBody })
+            // raycasterObjects.push(largeResume)
+        } 
+    } else {
+            console.log(`test`)
+            if (focusedObject) {
+            console.log(`removin`)
+            focusedObject.body.removeEventListener('collide', playHitSound)
+            world.removeBody(focusedObject.body)
+            // Remove mesh
+            scene.remove(focusedObject.mesh)
+        }
+
+        }
+  })
+
 
 
 // Controls
@@ -464,19 +502,49 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
 
-    camera.position.x = (cursor.x)
-    camera.position.y = -(cursor.y) + 6
+    camera.position.x = (cursor.x)*0.5
+    camera.position.y = -(cursor.y)*0.5 + 6
     camera.lookAt(cameraFocusVector)
 
+    raycaster.setFromCamera(mouse, camera)
+    // let raycasterTests = console.log(cannonObjects.m)
+    // const intersects = raycaster.intersectObjects(cannonObjects)
 
     // Update physics
     world.step(1 / 60, deltaTime, 3)
 
-    for(const object of objectsToUpdate)
+    for(const object of cannonObjects)
     {
         object.mesh.position.copy(object.body.position)
         object.mesh.quaternion.copy(object.body.quaternion)
+        // object.material.color.set('#ff0000')
     }
+
+    const intersects = raycaster.intersectObjects(raycasterObjects)
+    // console.log(intersects.length)
+    for (let object of raycasterObjects) {
+        object.material.color.set('#ffffff')
+    }
+
+
+    if (intersects.length) {
+
+        if (!currentIntersect) {
+            currentIntersect = intersects[0]
+        }
+
+        for (let intersect of intersects) {
+            if(intersect === intersects[0]) intersect.object.material.color.set('#ffeecc')
+        }
+
+    } else {
+        if (currentIntersect) {
+            currentIntersect = null
+        }
+    }
+
+    // for (let object of cannonObjects) {
+    // }
 
     // Update controls
     // controls.update()
