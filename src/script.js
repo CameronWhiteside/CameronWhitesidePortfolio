@@ -3,6 +3,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import * as CANNON from 'cannon-es'
+import { ColorKeyframeTrack, TextureDataType } from 'three'
+import { BODY_SLEEP_STATES } from 'cannon-es'
+import { generateUUID } from 'three/src/math/MathUtils'
 
 /**
  * Debug
@@ -38,6 +41,9 @@ debugObject.createBox = () =>
     )
 }
 gui.add(debugObject, 'createBox')
+
+debugObject.createResume = () => { createResume() }
+gui.add(debugObject, 'createResume')
 
 // Reset
 debugObject.reset = () =>
@@ -85,10 +91,8 @@ const playHitSound = (collision) =>
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
-console.log(textureLoader)
-const matcapTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
-console.log(matcapTexture)
-const cubeTextureLoader = new THREE.CubeTextureLoader()
+const yellowTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
+const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 
 
 /**
@@ -161,15 +165,74 @@ const createSphere = (radius, position) =>
 
 // Create box
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-const boxMaterial = new THREE.MeshMatcapMaterial({
-    matcap: matcapTexture
+const yellowMaterial = new THREE.MeshMatcapMaterial({
+    matcap: yellowTexture
 })
+const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
 
-const createBox = (width, height, depth, position, mass = 1) =>
+
+const createPedestal = (width, material, xOffset = 0) => {
+    const mainPedestal = new THREE.Mesh(boxGeometry, material)
+    mainPedestal.scale.set(width, 1000, width)
+    mainPedestal.receiveShadow = true
+    mainPedestal.position.copy({ x: 0, y: -500, z: 0 })
+
+    const pedestalShape = new CANNON.Box(new CANNON.Vec3(width/2, 500, width/2))
+    const pedestalBody = new CANNON.Body({
+        mass: 0,
+        shape: pedestalShape,
+        matieral: defaultMaterial
+    })
+
+    pedestalBody.position.copy({ x: 0, y: -500, z: 0 })
+
+
+    scene.add(mainPedestal)
+    world.addBody(pedestalBody)
+}
+
+createPedestal(20, yellowMaterial)
+
+
+const createResume = () => {
+
+    const resume = new THREE.Mesh(boxGeometry, resumeMaterial)
+    const height = 11/4
+    const width = 8.5/4
+    const depth = 0.05
+
+    resume.scale.set(width, height, depth)
+    // resumeMesh.castShadow = true
+    const position =   {
+                    x: (Math.random() - 0.5) * 10,
+                    y: 100 * Math.random()+30,
+                    z: (Math.random() - 0.5) * 10
+    }
+
+    resume.position.copy(position)
+
+    const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+    const resumeBody = new CANNON.Body({
+        mass: 1,
+        shape: resumeShape,
+        material: defaultMaterial
+    })
+
+    resumeBody.position.copy(position)
+    resumeBody.addEventListener('collide', playHitSound)
+
+    scene.add(resume)
+    world.addBody(resumeBody)
+    objectsToUpdate.push({ mesh: resume, body: resumeBody })
+
+}
+
+
+const createBox = (width, height, depth, position, mass = 1, material = yellowMaterial) =>
 {
     // Three.js mesh
-    const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
+    const mesh = new THREE.Mesh(boxGeometry, material)
     mesh.scale.set(width, height, depth)
     mesh.castShadow = true
     mesh.position.copy(position)
@@ -193,7 +256,7 @@ const createBox = (width, height, depth, position, mass = 1) =>
 
 
 //pedestal
-createBox(20, 1000, 20, {x: 0, y: -500, z:0}, 0)
+// createBox(20, 1000, 20, {x: 0, y: -500, z:0}, 0)
 createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
 
 /**
