@@ -27,13 +27,13 @@ gui.add(debugObject, 'createSphere')
 debugObject.createBox = () =>
 {
     createBox(
-        Math.random() * 5,
-        Math.random() * 5,
-        Math.random() * 5,
+        8.5/2,
+        11/2,
+        .1,
         {
-            x: (Math.random() - 0.5) * 0.13,
-            y: 3,
-            z: (Math.random() - 0.5) * .13
+            x: (Math.random() - 0.5) * 2,
+            y: 100 * Math.random(),
+            z: (Math.random() - 0.5) * 2
         }
     )
 }
@@ -103,7 +103,7 @@ const environmentMapTexture = cubeTextureLoader.load([
 const world = new CANNON.World()
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
-world.gravity.set(0, -12, 0)
+world.gravity.set(0, -28, 0)
 
 // Default material
 const defaultMaterial = new CANNON.Material('default')
@@ -112,7 +112,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.4
+        restitution: 0.2
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -276,10 +276,10 @@ const floor = new THREE.Mesh(
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
+const ambientLight = new THREE.AmbientLight(0xffffff, .58)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.57)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -317,19 +317,24 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000)
 camera.position.set(5, 10, 5)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
+controls.minDistance = 0;
+controls.maxDistance = 40;
+controls.maxPolarAngle = Math.PI/2;
+controls.minPolarAngle = Math.PI/4.5;
 controls.enableDamping = true
 
 /**
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha: true
 })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
