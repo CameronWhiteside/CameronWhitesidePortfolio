@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import * as CANNON from 'cannon-es'
-import { ColorKeyframeTrack, TextureDataType } from 'three'
+import { ColorKeyframeTrack, TextureDataType, Vector3 } from 'three'
 import { BODY_SLEEP_STATES } from 'cannon-es'
 import { generateUUID } from 'three/src/math/MathUtils'
 
@@ -210,6 +210,12 @@ const createResume = () => {
                     z: (Math.random() - 0.5) * 10
     }
 
+    const quaternion = new THREE.Quaternion();
+    quaternion.setFromAxisAngle(new THREE.Vector3(Math.random(), Math.random(), Math.random()), Math.random())
+    console.log(quaternion)
+
+    // object.mesh.quaternion.copy(object.body.quaternion)
+    resume.quaternion.copy(quaternion)
     resume.position.copy(position)
 
     const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
@@ -220,6 +226,7 @@ const createResume = () => {
     })
 
     resumeBody.position.copy(position)
+    resumeBody.quaternion.copy(quaternion)
     resumeBody.addEventListener('collide', playHitSound)
 
     scene.add(resume)
@@ -303,17 +310,38 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(5, 10, 5)
+const camera = new THREE.PerspectiveCamera(80, sizes.width / sizes.height, 0.1, 1000)
+camera.position.set(-5, 5, 25)
+let pedastal1Origin = new THREE.Vector3(0, 0, 0)
+
+gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
+gui.add(camera.position, 'y').min(-10).max(20).step(0.001)
+gui.add(camera.position, 'z').min(-35).max(30).step(0.001)
+let cameraFocusVector = pedastal1Origin
+
 scene.add(camera)
 
+
+const cursor = {
+    x: 0,
+    y: 0
+}
+
+window.addEventListener('mousemove', (event) =>
+{
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = event.clientY / sizes.height - 0.5
+
+})
+
+
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.minDistance = 0;
-controls.maxDistance = 40;
-controls.maxPolarAngle = Math.PI/2;
-controls.minPolarAngle = Math.PI/4.5;
-controls.enableDamping = true
+// const controls = new OrbitControls(camera, canvas)
+// controls.minDistance = 0;
+// controls.maxDistance = 40;
+// controls.maxPolarAngle = Math.PI/2;
+// controls.minPolarAngle = Math.PI/4.5;
+// controls.enableDamping = true
 
 /**
  * Renderer
@@ -339,6 +367,12 @@ const tick = () =>
     const deltaTime = elapsedTime - oldElapsedTime
     oldElapsedTime = elapsedTime
 
+
+    camera.position.x = (cursor.x) + 10
+    camera.position.y = -(cursor.y) + 10
+    camera.lookAt(cameraFocusVector)
+
+
     // Update physics
     world.step(1 / 60, deltaTime, 3)
 
@@ -349,7 +383,7 @@ const tick = () =>
     }
 
     // Update controls
-    controls.update()
+    // controls.update()
 
     // Render
     renderer.render(scene, camera)
