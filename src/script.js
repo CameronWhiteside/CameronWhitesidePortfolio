@@ -261,6 +261,9 @@ gltfLoader.load(
     }
 )
 
+
+let model
+
 gltfLoader.load(
     '/models/extruded-tech-stack-ring.glb',
     (gltf) =>
@@ -270,7 +273,8 @@ gltfLoader.load(
         techStack.scale.set(300, 300, 300)
         techStack.position.set(0, -10, -20)
         techStack.material = nameMaterial
-        scene.add(techStack)
+        model = techStack
+        scene.add(model)
         console.log(scene)
     }
 )
@@ -432,6 +436,7 @@ window.addEventListener('click', () => {
     if (currentIntersect) {
         let object = currentIntersect.object;
 
+
         const material = object.material.clone()
         const geometry = object.geometry.clone()
         const scale = object.scale.clone()
@@ -521,6 +526,9 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - oldElapsedTime
     oldElapsedTime = elapsedTime
+    if (model) {
+        model.rotation.y = -elapsedTime/10
+    }
 
 
     camera.position.x = (cursor.x)*0.5
