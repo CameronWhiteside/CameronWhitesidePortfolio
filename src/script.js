@@ -3,9 +3,11 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import * as CANNON from 'cannon-es'
-import { ColorKeyframeTrack, TextureDataType, Vector3 } from 'three'
 import { BODY_SLEEP_STATES } from 'cannon-es'
-import { generateUUID } from 'three/src/math/MathUtils'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
 /**
  * Debug
@@ -13,19 +15,19 @@ import { generateUUID } from 'three/src/math/MathUtils'
 const gui = new dat.GUI()
 const debugObject = {}
 
-debugObject.createSphere = () =>
-{
-    createSphere(
-        Math.random() * 8,
-        {
-            x: 0,
-            y: 9,
-            z: 0
-        }
-    )
-}
+// debugObject.createSphere = () =>
+// {
+//     createSphere(
+//         Math.random() * 8,
+//         {
+//             x: 0,
+//             y: 9,
+//             z: 0
+//         }
+//     )
+// }
 
-gui.add(debugObject, 'createSphere')
+// gui.add(debugObject, 'createSphere')
 
 debugObject.createBox = () =>
 {
@@ -70,6 +72,19 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+
+
+
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('/draco/')
+
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+
+let mixer = null
+
+
+
 /**
  * Sounds
  */
@@ -92,8 +107,51 @@ const playHitSound = (collision) =>
  */
 const textureLoader = new THREE.TextureLoader()
 const yellowTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
+const nameTexture = textureLoader.load('textures/matcaps/cheese.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+const yellowMaterial = new THREE.MeshMatcapMaterial({
+    matcap: yellowTexture
+})
+const nameMaterial = new THREE.MeshMatcapMaterial({
+    matcap: nameTexture
+})
+const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
+
+// const fontLoader = new FontLoader()
+
+// fontLoader.load(
+//     '/fonts/CHEDROS_Regular.json',
+//     (font) => {
+//         // Material
+//         const material = new THREE.MeshMatcapMaterial({ matcap: yellowTexture })
+
+//         // Text
+//         const textGeometry = new TextGeometry(
+//             'CAMERON',
+//             {
+//                 font: font,
+//                 size: 4,
+//                 height: 1,
+//                 curveSegments: 12,
+//                 bevelEnabled: true,
+//                 bevelThickness: 0.03,
+//                 bevelSize: 0.02,
+//                 bevelOffset: 0,
+//                 bevelSegments: 10
+//             }
+
+
+//             )
+//             // textGeometry.position.x = 20
+//             console.log(textGeometry)
+//             textGeometry.center()
+
+//         const text = new THREE.Mesh(textGeometry, material)
+//         scene.add(text)
+//     }
+// )
 
 /**
  * Physics
@@ -129,53 +187,47 @@ floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
 const objectsToUpdate = []
 
 // Create sphere
-const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
-const sphereMaterial = new THREE.MeshStandardMaterial({
-    metalness: 0.3,
-    roughness: 0.4,
-    // envMap: environmentMapTexture,
-    // envMapIntensity: 0.5
-})
+// const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
+// const sphereMaterial = new THREE.MeshStandardMaterial({
+//     metalness: 0.3,
+//     roughness: 0.4,
+//     // envMap: environmentMapTexture,
+//     // envMapIntensity: 0.5
+// })
 
-const createSphere = (radius, position) =>
-{
-    // Three.js mesh
-    const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
-    mesh.castShadow = true
-    mesh.scale.set(radius, radius, radius)
-    mesh.position.copy(position)
-    scene.add(mesh)
+// const createSphere = (radius, position) =>
+// {
+//     // Three.js mesh
+//     const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+//     mesh.castShadow = true
+//     mesh.scale.set(radius, radius, radius)
+//     mesh.position.copy(position)
+//     scene.add(mesh)
 
-    // Cannon.js body
-    const shape = new CANNON.Sphere(radius)
+//     // Cannon.js body
+//     const shape = new CANNON.Sphere(radius)
 
-    const body = new CANNON.Body({
-        mass: 1,
-        position: new CANNON.Vec3(0, 3, 0),
-        shape: shape,
-        material: defaultMaterial
-    })
-    body.position.copy(position)
-    body.addEventListener('collide', playHitSound)
-    world.addBody(body)
+//     const body = new CANNON.Body({
+//         mass: 1,
+//         position: new CANNON.Vec3(0, 3, 0),
+//         shape: shape,
+//         material: defaultMaterial
+//     })
+//     body.position.copy(position)
+//     body.addEventListener('collide', playHitSound)
+//     world.addBody(body)
 
-    // Save in objects
-    objectsToUpdate.push({ mesh, body })
-}
+//     // Save in objects
+//     objectsToUpdate.push({ mesh, body })
+// }
 
 // Create box
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-const yellowMaterial = new THREE.MeshMatcapMaterial({
-    matcap: yellowTexture
-})
-const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
 
 
 const createPedestal = (width, material, xOffset = 0) => {
     const mainPedestal = new THREE.Mesh(boxGeometry, material)
     mainPedestal.scale.set(width, 1000, width)
-    mainPedestal.receiveShadow = true
     mainPedestal.position.copy({ x: 0, y: -500, z: 0 })
 
     const pedestalShape = new CANNON.Box(new CANNON.Vec3(width/2, 500, width/2))
@@ -195,12 +247,54 @@ const createPedestal = (width, material, xOffset = 0) => {
 createPedestal(20, yellowMaterial)
 
 
+
+
+gltfLoader.load(
+    '/models/cameron-whiteside.glb',
+    (gltf) =>
+    {
+        let children = gltf.scene.children.slice()
+        let text = children[0]
+        console.log(text)
+        text.scale.set(4.5, 4.5, 4.5)
+        text.position.set(0, 3, 0)
+        text.material = nameMaterial
+        scene.add(text)
+
+        let box = new THREE.Box3()
+        box.setFromObject(text)
+        console.log(box.min.x)
+        let xSize = Math.abs(box.min.x - box.max.x)
+        let ySize = Math.abs(box.min.y - box.max.y)
+        let zSize = Math.abs(box.min.z - box.max.z)
+        let xCenter = 0.5 * (box.min.x + box.max.x)
+        let yCenter = 0.5 * (box.min.y + box.max.y)
+        let zCenter = 0.5 * (box.min.z + box.max.z)
+        // let zCenter = 3
+        let position = {x: xCenter, y: yCenter, z: zCenter}
+        console.log({ xSize, ySize, zSize, zCenter, yCenter, zCenter })
+        const textShape = new CANNON.Box(new CANNON.Vec3(xSize/2, ySize/2, zSize/2))
+        const textBody = new CANNON.Body({
+            mass: 0,
+            shape: textShape
+        })
+
+        textBody.position.copy(position)
+        world.addBody(textBody)
+        // objectsToUpdate.push({ mesh: text, body: textBody })
+        // console.log(text)
+        // const nameBox = new CANNON.Body()
+    }
+)
+
+
+
 const createResume = () => {
 
     const resume = new THREE.Mesh(boxGeometry, resumeMaterial)
-    const height = 11/4
-    const width = 8.5/4
-    const depth = 0.05
+    const height = 11/2.5
+    const width = 8.5/2.5
+    const depth = 0.1
 
     resume.scale.set(width, height, depth)
     // resumeMesh.castShadow = true
@@ -219,6 +313,8 @@ const createResume = () => {
     resume.position.copy(position)
 
     const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+    const resumePlane = new CANNON.Plane(new CANNON.Vec3(width * 0.5, height * 0.5))
+
     const resumeBody = new CANNON.Body({
         mass: 1,
         shape: resumeShape,
@@ -269,10 +365,10 @@ createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, .58)
+const ambientLight = new THREE.AmbientLight(0xffffff, .98)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.57)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.800)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 15
@@ -311,7 +407,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(80, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 5, 25)
+camera.position.set(-5, 5, 22)
 let pedastal1Origin = new THREE.Vector3(0, 0, 0)
 
 gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
@@ -368,8 +464,8 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
 
-    camera.position.x = (cursor.x) + 10
-    camera.position.y = -(cursor.y) + 10
+    camera.position.x = (cursor.x)
+    camera.position.y = -(cursor.y) + 6
     camera.lookAt(cameraFocusVector)
 
 
