@@ -13,10 +13,10 @@ const debugObject = {}
 debugObject.createSphere = () =>
 {
     createSphere(
-        Math.random() * 0.5,
+        Math.random() * 8,
         {
             x: 0,
-            y: 3,
+            y: 9,
             z: 0
         }
     )
@@ -47,7 +47,6 @@ debugObject.reset = () =>
         // Remove body
         object.body.removeEventListener('collide', playHitSound)
         world.removeBody(object.body)
-
         // Remove mesh
         scene.remove(object.mesh)
     }
@@ -74,7 +73,7 @@ const playHitSound = (collision) =>
 {
     const impactStrength = collision.contact.getImpactVelocityAlongNormal()
 
-    if(impactStrength > 1.5)
+    if(impactStrength > 4)
     {
         hitSound.volume = Math.random()
         hitSound.currentTime = 0
@@ -86,16 +85,11 @@ const playHitSound = (collision) =>
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+console.log(textureLoader)
+const matcapTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
+console.log(matcapTexture)
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 
-const environmentMapTexture = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.png',
-    '/textures/environmentMaps/0/nx.png',
-    '/textures/environmentMaps/0/py.png',
-    '/textures/environmentMaps/0/ny.png',
-    '/textures/environmentMaps/0/pz.png',
-    '/textures/environmentMaps/0/nz.png'
-])
 
 /**
  * Physics
@@ -112,7 +106,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.2
+        restitution: 0.12
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -123,40 +117,6 @@ const floorBody = new CANNON.Body()
 floorBody.mass = 0
 floorBody.addShape(floorShape)
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
-
-// const northWallBody = new CANNON.Body()
-// northWallBody.mass = 0
-// northWallBody.addShape(floorShape)
-// northWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0))
-// northWallBody.position = new CANNON.Vec3(0, 10, 10)
-
-// const southWallBody = new CANNON.Body()
-// southWallBody.mass = 0
-// southWallBody.addShape(floorShape)
-// southWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0))
-// southWallBody.position = new CANNON.Vec3(0, -10, -10)
-
-// const eastWallBody = new CANNON.Body()
-// eastWallBody.mass = 0
-// eastWallBody.addShape(floorShape)
-// eastWallBody.position = new CANNON.Vec3(0, 10,10)
-// eastWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), Math.PI * 0.5)
-
-// const westWallBody = new CANNON.Body()
-// westWallBody.mass = 0
-// westWallBody.addShape(floorShape)
-// westWallBody.position = new CANNON.Vec3(0, -10, -10)
-// westWallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), Math.PI * 0.5)
-
-
-
-
-// world.addBody(southWallBody)
-// world.addBody(northWallBody)
-// world.addBody(eastWallBody)
-// world.addBody(westWallBody)
-// world.addBody(floorBody)
-
 
 
 /**
@@ -201,12 +161,11 @@ const createSphere = (radius, position) =>
 
 // Create box
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-const boxMaterial = new THREE.MeshStandardMaterial({
-    metalness: 0.3,
-    roughness: 0.4,
-    // envMap: environmentMapTexture,
-    // envMapIntensity: 0.5
+const boxMaterial = new THREE.MeshMatcapMaterial({
+    matcap: matcapTexture
 })
+
+
 const createBox = (width, height, depth, position, mass = 1) =>
 {
     // Three.js mesh
@@ -233,45 +192,9 @@ const createBox = (width, height, depth, position, mass = 1) =>
 }
 
 
-// createBox(3, 20, 20, {x: -10, y: 10, z:0}, 0)
-// createBox(20, 20, .1, {x: 0, y: 10, z:10}, 0)
-// createBox(.1, 20, 20, {x: 10, y: 10, z:0}, 0)
+//pedestal
 createBox(20, 1000, 20, {x: 0, y: -500, z:0}, 0)
-// createBox(20, 20, .1, {x: 0, y: 10, z:-10}, 0)
-// createBox(20, .1, 20, {x: 0, y: 20, z:0}, 0)
-
 createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
-
-/**
- * Floor
- */
-const wallGeometry = new THREE.PlaneGeometry(20,20)
-const wallMaterial = new THREE.MeshStandardMaterial({
-    color: '#ffcc22',
-    metalness: 0.3,
-    roughness: 0.4,
-    envMap: environmentMapTexture,
-    envMapIntensity: 0.5
-})
-
-
-const floor = new THREE.Mesh(
-    wallGeometry, wallMaterial
-)
-
-// floor.receiveShadow = true
-// floor.rotation.x = - Math.PI * 0.5
-// scene.add(floor)
-
-// const northWall = new THREE.Mesh(
-//     wallGeometry, wallMaterial
-// )
-
-// northWall.receiveShadow = true
-// northWall.position.z = -10;
-// northWall.position.y = 10;
-// // northWall.rotation.x = - Math.PI * 0.5
-// scene.add(northWall)
 
 /**
  * Lights
