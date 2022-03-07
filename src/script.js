@@ -7,8 +7,15 @@ import { BODY_SLEEP_STATES } from 'cannon-es'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
 import { gsap } from 'gsap'
+
+
 
 
 const loadingBarElement = document.querySelector('.loading-bar')
@@ -162,7 +169,7 @@ const blackTexture = textureLoader.load('textures/matcaps/black-1.png')
 const cheeseTexture = textureLoader.load('textures/matcaps/cheese.png')
 const chalkboardTexture = textureLoader.load('textures/matcaps/chalkboard.png')
 const pinkTexture = textureLoader.load('textures/matcaps/pink.png')
-const purpleTexture = textureLoader.load('textures/matcaps/purplestretch.png')
+const purpleTexture = textureLoader.load('textures/matcaps/silver.png')
 const orangeTexture = textureLoader.load('textures/matcaps/orangetoon.png')
 const lightPinkTexture = textureLoader.load('textures/matcaps/lightpink.png')
 const durpleTexture = textureLoader.load('textures/matcaps/durple.png')
@@ -328,7 +335,7 @@ gltfLoader.load(
         let techStack = gltf.scene.children[0]
         techStack.scale.set(500, 200, 500)
         techStack.position.set(0, -7, -50)
-        techStack.material = whiteMaterial
+        techStack.material = purpleMaterial
         model = techStack
         scene.add(model)
         // console.log(scene)
@@ -868,6 +875,8 @@ window.addEventListener('click', () => {
 // controls.minPolarAngle = Math.PI/4.5;
 // controls.enableDamping = true
 
+
+
 /**
  * Renderer
  */
@@ -879,6 +888,50 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+
+
+let RenderTargetClass = null
+
+if(renderer.getPixelRatio() === 1 && renderer.capabilities.isWebGL2)
+{
+    RenderTargetClass = THREE.WebGLMultisampleRenderTarget
+    console.log('Using WebGLMultisampleRenderTarget')
+}
+else
+{
+    RenderTargetClass = THREE.WebGLRenderTarget
+    console.log('Using WebGLRenderTarget')
+}
+
+const renderTarget = new RenderTargetClass(
+
+
+    800,
+    600,
+    {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat
+    }
+)
+
+if (renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2) {
+    const smaaPass = new SMAAPass()
+    effectComposer.addPass(smaaPass)
+}
+
+const effectComposer = new EffectComposer(renderer, renderTarget)
+effectComposer.setSize(sizes.width, sizes.height)
+effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+const renderPass = new RenderPass(scene, camera)
+effectComposer.addPass(renderPass)
+const smaaPass = new SMAAPass()
+effectComposer.addPass(smaaPass)
+
+// const rgbShiftPass = new ShaderPass(RGBShiftShader)
+// effectComposer.addPass(rgbShiftPass)
 
 /**
  * Animate
@@ -954,7 +1007,8 @@ const tick = () =>
     // controls.update()
 
     // Render
-    renderer.render(scene, camera)
+    // renderer.render(scene, camera)
+    effectComposer.render()
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
