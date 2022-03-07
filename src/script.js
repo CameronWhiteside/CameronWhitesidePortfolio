@@ -711,6 +711,9 @@ window.addEventListener('resize', () =>
 
     // Update camera
     camera.aspect = sizes.width / sizes.height
+    console.log(camera.aspect)
+    camera.position.z = 40 - camera.aspect * 9
+    camera.fov = 105 - window.innerWidth / window.innerHeight * 12
     camera.updateProjectionMatrix()
 
     // Update renderer
@@ -722,8 +725,10 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 6, 30)
+const camera = new THREE.PerspectiveCamera( 105 - window.innerWidth / window.innerHeight * 12, sizes.width / sizes.height, 0.1, 1000)
+camera.position.set(-5, 6, 40 - window.innerWidth / window.innerHeight * 9)
+camera.fov = 105 - window.innerWidth / window.innerHeight * 12
+console.log(camera)
 let pedastal1Origin = new THREE.Vector3(0, 3, 0)
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
