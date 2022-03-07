@@ -12,8 +12,8 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 /**
  * Debug
  */
-const gui = new dat.GUI()
-const debugObject = {}
+// const gui = new dat.GUI()
+// const debugObject = {}
 const raycasterObjects = []
 const cannonObjects = []
 let focusedObject, currentIntersect
@@ -35,8 +35,8 @@ let focusedObject, currentIntersect
 // }
 // gui.add(debugObject, 'createBox')
 
-debugObject.createResume = () => { createResume() }
-gui.add(debugObject, 'createResume')
+// debugObject.createResume = () => { createResume() }
+// gui.add(debugObject, 'createResume')
 
 // Reset
 const reset = () =>
@@ -52,7 +52,7 @@ const reset = () =>
 
     cannonObjects.splice(0, cannonObjects.length)
 }
-gui.add(debugObject, 'reset')
+// gui.add(debugObject, 'reset')
 
 /**
  * Base
@@ -108,6 +108,8 @@ const lightPinkTexture = textureLoader.load('textures/matcaps/lightpink.png')
 const durpleTexture = textureLoader.load('textures/matcaps/durple.png')
 const redTexture = textureLoader.load('textures/matcaps/red-plastic.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
+const blueTexture = textureLoader.load('textures/matcaps/blue.png')
+const greenTexture = textureLoader.load('textures/matcaps/green.png')
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const yellowMaterial = new THREE.MeshMatcapMaterial({
     matcap: yellowTexture
@@ -136,6 +138,12 @@ const orangeMaterial = new THREE.MeshMatcapMaterial({
 
 const redMaterial = new THREE.MeshMatcapMaterial({
     matcap: redTexture
+})
+const blueMaterial = new THREE.MeshMatcapMaterial({
+    matcap: blueTexture
+})
+const greenMaterial = new THREE.MeshMatcapMaterial({
+    matcap: greenTexture
 })
 
 const durpleMaterial = new THREE.MeshMatcapMaterial({
@@ -276,11 +284,32 @@ gltfLoader.load(
     {
         console.log(gltf.scene.children.length)
         let techStack = gltf.scene.children[1]
-        techStack.scale.set(500, 500, 500)
-        techStack.position.set(0, -7, -50)
-        techStack.material = whiteMaterial
+        techStack.scale.set(50, 7, 50)
+        techStack.position.set(-7, 13, -20)
+        techStack.rotation.x = Math.PI/2
+        techStack.material = greenMaterial
         githubLink = techStack
-        scene.add(model)
+        raycasterObjects.push(githubLink)
+        scene.add(githubLink)
+        // console.log(scene)
+    }
+)
+
+let linkedInLink
+
+gltfLoader.load(
+    '/models/linkedin.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let techStack = gltf.scene.children[0]
+        techStack.scale.set(50, 7, 50)
+        techStack.position.set(7, 13, -20)
+        techStack.rotation.x = Math.PI/2
+        techStack.material = blueMaterial
+        linkedInLink = techStack
+        raycasterObjects.push(linkedInLink)
+        scene.add(linkedInLink)
         // console.log(scene)
     }
 )
@@ -390,9 +419,9 @@ gltfLoader.load(
         recipeopleSignWords = recipeopleSignText
         recipeopleSignText.scale.set(1.601, 1.601, 1.601)
         recipeopleSignText.position.set(14.22, 3.2, 6.4)
-        gui.add(recipeopleSignText.rotation, 'x').min(-3).max(3).step(0.001)
-        gui.add(recipeopleSignText.rotation, 'y').min(-3).max(3).step(0.001)
-        gui.add(recipeopleSignText.rotation, 'z').min(-1).max(1).step(0.001)
+        // gui.add(recipeopleSignText.rotation, 'x').min(-3).max(3).step(0.001)
+        // gui.add(recipeopleSignText.rotation, 'y').min(-3).max(3).step(0.001)
+        // gui.add(recipeopleSignText.rotation, 'z').min(-1).max(1).step(0.001)
         recipeopleSignText.rotation.x = 1.451
         recipeopleSignText.rotation.y = -0.27
         recipeopleSignText.rotation.z = 0.08
@@ -442,9 +471,9 @@ gltfLoader.load(
         oneTenSignWords = oneTenSignText
         oneTenSignText.scale.set(1.301, 1.301, 1.301)
         oneTenSignText.position.set(-13.32, 3.2, 6.2)
-        gui.add(oneTenSignText.rotation, 'x').min(-3).max(3).step(0.001)
-        gui.add(oneTenSignText.rotation, 'y').min(-3).max(3).step(0.001)
-        gui.add(oneTenSignText.rotation, 'z').min(-1).max(1).step(0.001)
+        // gui.add(oneTenSignText.rotation, 'x').min(-3).max(3).step(0.001)
+        // gui.add(oneTenSignText.rotation, 'y').min(-3).max(3).step(0.001)
+        // gui.add(oneTenSignText.rotation, 'z').min(-1).max(1).step(0.001)
         oneTenSignText.rotation.x = 1.451
         oneTenSignText.rotation.y = 0.27
         oneTenSignText.rotation.z = -0.08
@@ -633,9 +662,9 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(70, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 12, 30)
-let pedastal1Origin = new THREE.Vector3(0, 0, 0)
+const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, 0.1, 1000)
+camera.position.set(-5, 7, 34)
+let pedastal1Origin = new THREE.Vector3(0, 2, 0)
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
 // gui.add(camera.position, 'y').min(-10).max(20).step(0.001)
@@ -743,12 +772,12 @@ window.addEventListener('click', () => {
 
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.minDistance = 15;
-controls.maxDistance = 50;
-controls.maxPolarAngle = Math.PI/2;
-controls.minPolarAngle = Math.PI/4.5;
-controls.enableDamping = true
+// const controls = new OrbitControls(camera, canvas)
+// controls.minDistance = 15;
+// controls.maxDistance = 50;
+// controls.maxPolarAngle = Math.PI/2;
+// controls.minPolarAngle = Math.PI/4.5;
+// controls.enableDamping = true
 
 /**
  * Renderer
@@ -789,7 +818,7 @@ const tick = () =>
 
 
     camera.position.x = (cursor.x)
-    camera.position.y = -(cursor.y) + 6
+    // camera.position.y = -(cursor.y) + 8
     camera.lookAt(cameraFocusVector)
 
     raycaster.setFromCamera(mouse, camera)
