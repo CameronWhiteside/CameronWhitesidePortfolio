@@ -20,20 +20,20 @@ let focusedObject, currentIntersect
 
 
 
-debugObject.createBox = () =>
-{
-    createBox(
-        8.5/2,
-        11/2,
-        .1,
-        {
-            x: (Math.random() - 0.5) * 2,
-            y: 100 * Math.random(),
-            z: (Math.random() - 0.5) * 2
-        }
-    )
-}
-gui.add(debugObject, 'createBox')
+// debugObject.createBox = () =>
+// {
+//     createBox(
+//         8.5/2,
+//         11/2,
+//         .1,
+//         {
+//             x: (Math.random() - 0.5) * 2,
+//             y: 100 * Math.random(),
+//             z: (Math.random() - 0.5) * 2
+//         }
+//     )
+// }
+// gui.add(debugObject, 'createBox')
 
 debugObject.createResume = () => { createResume() }
 gui.add(debugObject, 'createResume')
@@ -102,6 +102,7 @@ const blackTexture = textureLoader.load('textures/matcaps/black-1.png')
 const cheeseTexture = textureLoader.load('textures/matcaps/cheese.png')
 const chalkboardTexture = textureLoader.load('textures/matcaps/chalkboard.png')
 const pinkTexture = textureLoader.load('textures/matcaps/pink.png')
+const purpleTexture = textureLoader.load('textures/matcaps/purplestretch.png')
 const orangeTexture = textureLoader.load('textures/matcaps/orangetoon.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
@@ -128,6 +129,10 @@ const chalkboardMaterial = new THREE.MeshMatcapMaterial({
 
 const orangeMaterial = new THREE.MeshMatcapMaterial({
     matcap: orangeTexture
+})
+
+const purpleMaterial = new THREE.MeshMatcapMaterial({
+    matcap: purpleTexture
 })
 
 
@@ -258,8 +263,8 @@ gltfLoader.load(
     {
         // console.log(gltf.scene.children.length)
         let weatherSign = gltf.scene.children[0]
-        weatherSign.scale.set(.181, .181, .181)
-        weatherSign.position.set(14, 0, 0)
+        weatherSign.scale.set(.261, .261, .261)
+        weatherSign.position.set(21, 0, -20)
         weatherSign.rotation.x = -Math.PI / 20
         weatherSign.rotation.z = -Math.PI / 20
         weatherSign.rotation.y = -Math.PI/12
@@ -297,6 +302,110 @@ gltfLoader.load(
 )
 
 
+let recipeopleSignBoard
+
+gltfLoader.load(
+    '/models/vertical-sign.glb',
+    (gltf) =>
+    {
+        // console.log(gltf.scene.children.length)
+        let recipeopleSign = gltf.scene.children[0]
+        recipeopleSign.scale.set(.201, .061, .101)
+        recipeopleSign.position.set(13, 0.5, 6)
+        // gui.add(recipeopleSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(recipeopleSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(recipeopleSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        recipeopleSign.rotation.x = -0.05
+        recipeopleSign.rotation.y = -0.1
+        recipeopleSign.rotation.z = -0.26
+        recipeopleSign.material = purpleMaterial
+        recipeopleSignBoard = recipeopleSign
+        raycasterObjects.push(recipeopleSignBoard)
+        scene.add(recipeopleSignBoard)
+        // console.log(scene)
+    }
+)
+
+
+let recipeopleSignWords
+
+
+gltfLoader.load(
+    '/models/one-ten-text.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let recipeopleSignText = gltf.scene
+        recipeopleSignWords = recipeopleSignText
+        recipeopleSignText.scale.set(1.301, 1.301, 1.301)
+        recipeopleSignText.position.set(13.32, 3.2, 6.2)
+        gui.add(recipeopleSignText.rotation, 'x').min(-3).max(3).step(0.001)
+        gui.add(recipeopleSignText.rotation, 'y').min(-3).max(3).step(0.001)
+        gui.add(recipeopleSignText.rotation, 'z').min(-1).max(1).step(0.001)
+        recipeopleSignText.rotation.x = 1.451
+        recipeopleSignText.rotation.y = -0.27
+        recipeopleSignText.rotation.z = 0.08
+        recipeopleSignText.children.forEach(child => {
+            child.material = nameMaterial
+        })
+
+        scene.add(recipeopleSignWords)
+        console.log(scene)
+    }
+)
+
+let oneTenSignBoard
+
+gltfLoader.load(
+    '/models/vertical-sign.glb',
+    (gltf) =>
+    {
+        // console.log(gltf.scene.children.length)
+        let oneTenSign = gltf.scene.children[0]
+        oneTenSign.scale.set(.201, .061, .101)
+        oneTenSign.position.set(-13, 0.5, 6)
+        // gui.add(oneTenSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(oneTenSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(oneTenSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        oneTenSign.rotation.x = -0.05
+        oneTenSign.rotation.y = 0.1
+        oneTenSign.rotation.z = 0.26
+        oneTenSign.material = purpleMaterial
+        oneTenSignBoard = oneTenSign
+        raycasterObjects.push(oneTenSignBoard)
+        scene.add(oneTenSignBoard)
+        // console.log(scene)
+    }
+)
+
+
+let oneTenSignWords
+
+
+gltfLoader.load(
+    '/models/one-ten-text.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let oneTenSignText = gltf.scene
+        oneTenSignWords = oneTenSignText
+        oneTenSignText.scale.set(1.301, 1.301, 1.301)
+        oneTenSignText.position.set(-13.32, 3.2, 6.2)
+        gui.add(oneTenSignText.rotation, 'x').min(-3).max(3).step(0.001)
+        gui.add(oneTenSignText.rotation, 'y').min(-3).max(3).step(0.001)
+        gui.add(oneTenSignText.rotation, 'z').min(-1).max(1).step(0.001)
+        oneTenSignText.rotation.x = 1.451
+        oneTenSignText.rotation.y = 0.27
+        oneTenSignText.rotation.z = -0.08
+        oneTenSignText.children.forEach(child => {
+            child.material = nameMaterial
+        })
+
+        scene.add(oneTenSignWords)
+        console.log(scene)
+    }
+)
+
 let weatherSignWords
 
 
@@ -307,8 +416,8 @@ gltfLoader.load(
         console.log(gltf.scene.children.length)
         let weatherSignText = gltf.scene
         weatherSignWords = weatherSignText
-        weatherSignText.scale.set(.008, 1.1, 1.1)
-        weatherSignText.position.set(14.6, 7.1, 0.1)
+        weatherSignText.scale.set(.008, 1.61, 1.61)
+        weatherSignText.position.set(22.0, 10, -20)
         // gui.add(weatherSignText.rotation, 'x').min(-1).max(1).step(0.001)
         // gui.add(weatherSignText.rotation, 'y').min(-3).max(3).step(0.001)
         // gui.add(weatherSignText.rotation, 'z').min(-1).max(1).step(0.001)
@@ -522,7 +631,7 @@ window.addEventListener('click', () => {
 
         console.log(scale)
 
-        if (scale.x === .181) {
+        if (scale.x === .261) {
             console.log(true)
             for (let i = 0; i < 5; i++) {
                 setTimeout(createResume, 100 * i)
