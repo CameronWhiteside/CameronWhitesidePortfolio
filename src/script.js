@@ -8,6 +8,39 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { gsap } from 'gsap'
+
+
+const loadingBarElement = document.querySelector('.loading-bar')
+let sceneReady = false
+const loadingManager = new THREE.LoadingManager(
+    // Loaded
+    () =>
+    {
+        // Wait a little
+        window.setTimeout(() =>
+        {
+            // Animate overlay
+            gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
+
+            // Update loadingBarElement
+            loadingBarElement.classList.add('ended')
+            loadingBarElement.style.transform = ''
+        }, 500)
+
+        window.setTimeout(() => {
+            sceneReady = true
+        }, 3000)
+    },
+
+    // Progress
+    (itemUrl, itemsLoaded, itemsTotal) =>
+    {
+        // Calculate the progress and update the loadingBarElement
+        const progressRatio = itemsLoaded / itemsTotal
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
+    }
+)
 
 /**
  * Debug
@@ -52,7 +85,7 @@ const reset = () =>
 
     cannonObjects.splice(0, cannonObjects.length)
 }
-// gui.add(debugObject, 'reset')
+
 
 /**
  * Base
@@ -64,12 +97,39 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 
+const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1)
+const overlayMaterial = new THREE.ShaderMaterial({
+    // wireframe: true,
+    transparent: true,
+    uniforms:
+    {
+        uAlpha: { value: 1 }
+    },
+    vertexShader: `
+        void main()
+        {
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float uAlpha;
+
+        void main()
+        {
+            gl_FragColor = vec4(0.584, 0.1254, 0.3137, uAlpha);
+        }
+    `
+})
+const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial)
+scene.add(overlay)
+
+
 
 
 const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 
-const gltfLoader = new GLTFLoader()
+const gltfLoader = new GLTFLoader(loadingManager)
 gltfLoader.setDRACOLoader(dracoLoader)
 
 
@@ -230,7 +290,7 @@ gltfLoader.load(
         // console.log(text)
         text.scale.set(150, 1, 150)
         text.position.set(0, 2.9, 0)
-        text.material = purpleMaterial
+        text.material = chalkboardMaterial
         // console.log(text)
         scene.add(text)
 
@@ -266,7 +326,7 @@ gltfLoader.load(
     {
         // console.log(gltf.scene.children.length)
         let techStack = gltf.scene.children[0]
-        techStack.scale.set(500, 500, 500)
+        techStack.scale.set(500, 200, 500)
         techStack.position.set(0, -7, -50)
         techStack.material = whiteMaterial
         model = techStack
@@ -328,7 +388,7 @@ gltfLoader.load(
         // weatherSign.rotation.x = -Math.PI / 20
         // weatherSign.rotation.z = -Math.PI / 20
         // weatherSign.rotation.y = -Math.PI/12
-        aboutTextObj.material = whiteMaterial
+        aboutTextObj.material = durpleMaterial
         aboutText = aboutTextObj
         // raycasterObjects.push(aboutText)
         scene.add(aboutText)
@@ -694,6 +754,36 @@ window.addEventListener('mousemove', (event) =>
 
 window.addEventListener('click', () => {
 
+
+    if (!focusedObject && currentIntersect) {
+
+        if (currentIntersect.object === githubLink) {
+            window.open('https://github.com/CameronWhiteside', '_blank')
+        }
+
+        if (currentIntersect.object === linkedInLink) {
+            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+        }
+
+        if (currentIntersect.object === groggoSignBoard) {
+            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+        }
+
+        if (currentIntersect.object === recipeopleSignBoard) {
+            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+        }
+
+        if (currentIntersect.object === oneTenSignBoard) {
+            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+        }
+
+        if (currentIntersect.object === weatherSignBoard) {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createResume, 100 * i)
+            }
+        }
+    }
+
     if (focusedObject) {
         focusedObject.body.removeEventListener('collide', playHitSound)
         world.removeBody(focusedObject.body)
@@ -708,15 +798,6 @@ window.addEventListener('click', () => {
         const material = object.material.clone()
         const scale = object.scale.clone()
         const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
-
-        // console.log(scale)
-
-        if (scale.x === .261) {
-            // console.log(true)
-            for (let i = 0; i < 5; i++) {
-                setTimeout(createResume, 100 * i)
-            }
-        }
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
             // console.log('lorp')
@@ -755,6 +836,7 @@ window.addEventListener('click', () => {
             cannonObjects.push({ mesh: largeResume, body: resumeBody })
             // raycasterObjects.push(largeResume)
         }
+
     } else {
 
             if (focusedObject) {
@@ -813,7 +895,7 @@ const tick = () =>
     const deltaTime = elapsedTime - oldElapsedTime
     oldElapsedTime = elapsedTime
     if (model) {
-        model.rotation.y = -elapsedTime/25
+        model.rotation.y = -elapsedTime/18
     }
 
 
