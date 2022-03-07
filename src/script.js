@@ -813,7 +813,7 @@ window.addEventListener('click', () => {
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
             // console.log('lorp')
-            window.open('https://docs.google.com/document/d/1M6zMf3KWAOxENospVAxUWgvHdqbZNbkQOYAACPJTncw/')
+            window.open('https://drive.google.com/file/d/1s1uBYYcPuPqNzedr_LpXSohZyVJ6aMNv/view')
             // const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
             // const height = 11 * 2.5
             // const width = 8.5 * 2.5
