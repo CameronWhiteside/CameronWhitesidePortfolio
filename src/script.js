@@ -723,8 +723,8 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(60, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 7, 34)
-let pedastal1Origin = new THREE.Vector3(0, 2, 0)
+camera.position.set(-5, 6, 30)
+let pedastal1Origin = new THREE.Vector3(0, 3, 0)
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
 // gui.add(camera.position, 'y').min(-10).max(20).step(0.001)
@@ -857,8 +857,8 @@ window.addEventListener('click', () => {
 
 // Controls
 // const controls = new OrbitControls(camera, canvas)
-// controls.minDistance = 15;
-// controls.maxDistance = 50;
+// controls.minDistance = 16;
+// controls.maxDistance = 35;
 // controls.maxPolarAngle = Math.PI/2;
 // controls.minPolarAngle = Math.PI/4.5;
 // controls.enableDamping = true
