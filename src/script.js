@@ -752,7 +752,15 @@ window.addEventListener('mousemove', (event) =>
 })
 
 
+let groggoPop = document.getElementById('groggo')
+groggoPop.addEventListener('click', (e)=> e.stopPropagation())
+let onetotenPop = document.getElementById('onetoten')
+onetotenPop.addEventListener('click', (e)=> e.stopPropagation())
+let recipeoplePop = document.getElementById('recipeople')
+recipeoplePop.addEventListener('click', (e) => e.stopPropagation())
+
 window.addEventListener('click', () => {
+
 
 
     if (!focusedObject && currentIntersect) {
@@ -766,15 +774,19 @@ window.addEventListener('click', () => {
         }
 
         if (currentIntersect.object === groggoSignBoard) {
-            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+            console.log('grog')
+            focusedObject = groggoPop
+            reset()
         }
 
         if (currentIntersect.object === recipeopleSignBoard) {
-            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+            focusedObject = recipeoplePop
+            reset()
         }
 
         if (currentIntersect.object === oneTenSignBoard) {
-            window.open('https://www.linkedin.com/in/cameronwhiteside/', '_blank')
+            focusedObject = onetotenPop
+            reset()
         }
 
         if (currentIntersect.object === weatherSignBoard) {
@@ -782,15 +794,15 @@ window.addEventListener('click', () => {
                 setTimeout(createResume, 100 * i)
             }
         }
+
+        if (focusedObject) {
+            focusedObject.classList.add('visible')
+        }
+    } else if (focusedObject) {
+        focusedObject.classList.remove('visible')
+        focusedObject = null
     }
 
-    if (focusedObject) {
-        focusedObject.body.removeEventListener('collide', playHitSound)
-        world.removeBody(focusedObject.body)
-        // Remove mesh
-            scene.remove(focusedObject.mesh)
-            focusedObject = ''
-    }
     if (currentIntersect) {
         let object = currentIntersect.object;
 
@@ -801,54 +813,44 @@ window.addEventListener('click', () => {
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
             // console.log('lorp')
-            const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
-            const height = 11 * 2.5
-            const width = 8.5 * 2.5
-            const depth = 0.1
+            window.open('https://docs.google.com/document/d/1M6zMf3KWAOxENospVAxUWgvHdqbZNbkQOYAACPJTncw/')
+            // const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
+            // const height = 11 * 2.5
+            // const width = 8.5 * 2.5
+            // const depth = 0.1
 
-            largeResume.scale.set(width, height, depth)
+            // largeResume.scale.set(width, height, depth)
 
-            const position = {
-                x: 0,
-                y: 3.5,
-                z: 14
-            }
+            // const position = {
+            //     x: 0,
+            //     y: 3.5,
+            //     z: 14
+            // }
 
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/15)
-            largeResume.quaternion.copy(quaternion)
-            largeResume.position.copy(position)
+            // const quaternion = new THREE.Quaternion();
+            // quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/15)
+            // largeResume.quaternion.copy(quaternion)
+            // largeResume.position.copy(position)
 
-            const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-            const resumeBody = new CANNON.Body({
-                mass: 0,
-                shape: resumeShape,
-                material: defaultMaterial
-            })
+            // const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+            // const resumeBody = new CANNON.Body({
+            //     mass: 0,
+            //     shape: resumeShape,
+            //     material: defaultMaterial
+            // })
 
-            resumeBody.position.copy(position)
-            resumeBody.quaternion.copy(quaternion)
-            resumeBody.addEventListener('collide', playHitSound)
+            // resumeBody.position.copy(position)
+            // resumeBody.quaternion.copy(quaternion)
+            // resumeBody.addEventListener('collide', playHitSound)
 
-            scene.add(largeResume)
-            focusedObject = { mesh: largeResume, body: resumeBody }
-            world.addBody(resumeBody)
-            cannonObjects.push({ mesh: largeResume, body: resumeBody })
+            // scene.add(largeResume)
+            // focusedObject = { mesh: largeResume, body: resumeBody }
+            // world.addBody(resumeBody)
+            // cannonObjects.push({ mesh: largeResume, body: resumeBody })
             // raycasterObjects.push(largeResume)
         }
 
-    } else {
-
-            if (focusedObject) {
-
-            focusedObject.body.removeEventListener('collide', playHitSound)
-            world.removeBody(focusedObject.body)
-            // Remove mesh
-                scene.remove(focusedObject.mesh)
-                focusedObject = ''
-            }
-
-        }
+    }
   })
 
 

@@ -2,6 +2,7 @@
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
@@ -58,19 +59,33 @@ body{
     top: calc(50% - 350px);
     background-color: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     padding: 20px;
+    display: none;
+}
+
+.popup.visible{
+    display: flex;
 }
 
 #groggo{
     border: 10px solid greenyellow;
 }
 
+#onetoten{
+    border: 10px solid violet;
+}
+
+#recipeople{
+    border: 10px solid deepskyblue;
+    height: 620px;
+}
+
 #groggo > .popup-image{
     /* background-color: pink; */
-    height: 550px;
-    width: 445px;
+    height: 500px;
+    width: 380px;
     position: absolute;
     bottom: 0;
     right: 0px;
@@ -81,13 +96,62 @@ body{
 
 }
 
+#onetoten> .popup-image{
+    /* background-color: pink; */
+    height: 550px;
+    width: 345px;
+    position: absolute;
+    bottom: 50px;
+    right: 20px;
+    background-image: url('../static/popups/one-to-ten-portfolio.png');
+    background-size: contain;
+    background-position: right bottom;
+    background-repeat: no-repeat;
+
+}
+
+#recipeople> .popup-image{
+    /* background-color: pink; */
+    height: 550px;
+    width: 345px;
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    background-image: url('../static/popups/recipeople-portfolio.png');
+    background-size: contain;
+    background-position: right bottom;
+    background-repeat: no-repeat;
+
+}
+
 #groggo > h1{
-    font-size: 50px;
+    font-size: 44px;
     margin-bottom: 10px;
+}
+
+#onetoten > h1{
+    font-size: 92px;
+    margin-bottom: 0px;
+}
+
+#recipeople > h1{
+    font-size: 85px;
+    margin-bottom: 0px;
 }
 
 #groggo a{
     background-color: greenyellow;
+    padding: 25px 0;
+}
+
+#onetoten a{
+    background-color: violet;
+    padding: 30px 0;
+}
+
+#recipeople a{
+    background-color: deepskyblue;
+    padding: 28px 0;
 }
 
 
