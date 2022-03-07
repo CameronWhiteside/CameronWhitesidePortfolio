@@ -104,6 +104,9 @@ const chalkboardTexture = textureLoader.load('textures/matcaps/chalkboard.png')
 const pinkTexture = textureLoader.load('textures/matcaps/pink.png')
 const purpleTexture = textureLoader.load('textures/matcaps/purplestretch.png')
 const orangeTexture = textureLoader.load('textures/matcaps/orangetoon.png')
+const lightPinkTexture = textureLoader.load('textures/matcaps/lightpink.png')
+const durpleTexture = textureLoader.load('textures/matcaps/durple.png')
+const redTexture = textureLoader.load('textures/matcaps/red-plastic.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const yellowMaterial = new THREE.MeshMatcapMaterial({
@@ -131,8 +134,20 @@ const orangeMaterial = new THREE.MeshMatcapMaterial({
     matcap: orangeTexture
 })
 
+const redMaterial = new THREE.MeshMatcapMaterial({
+    matcap: redTexture
+})
+
+const durpleMaterial = new THREE.MeshMatcapMaterial({
+    matcap: durpleTexture
+})
+
 const purpleMaterial = new THREE.MeshMatcapMaterial({
     matcap: purpleTexture
+})
+
+const lightPinkMaterial = new THREE.MeshMatcapMaterial({
+    matcap: lightPinkTexture
 })
 
 
@@ -207,7 +222,7 @@ gltfLoader.load(
         // console.log(text)
         text.scale.set(150, 1, 150)
         text.position.set(0, 2.9, 0)
-        text.material = chalkboardMaterial
+        text.material = purpleMaterial
         // console.log(text)
         scene.add(text)
 
@@ -231,9 +246,6 @@ gltfLoader.load(
 
         textBody.position.copy(position)
         world.addBody(textBody)
-        // cannonObjects.push({ mesh: text, body: textBody })
-        // console.log(text)
-        // const nameBox = new CANNON.Body()
     }
 )
 
@@ -255,8 +267,47 @@ gltfLoader.load(
     }
 )
 
-let weatherSignBoard
 
+let githubLink
+
+gltfLoader.load(
+    '/models/github.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let techStack = gltf.scene.children[1]
+        techStack.scale.set(500, 500, 500)
+        techStack.position.set(0, -7, -50)
+        techStack.material = whiteMaterial
+        githubLink = techStack
+        scene.add(model)
+        // console.log(scene)
+    }
+)
+
+
+let aboutText
+//about text
+gltfLoader.load(
+    '/models/about-text.glb',
+    (gltf) =>
+    {
+        // console.log(gltf.scene.children.length)
+        let aboutTextObj = gltf.scene.children[1]
+        aboutTextObj.scale.set(35, 35, 35)
+        aboutTextObj.position.set(0, -2.5, 10.1)
+        // weatherSign.rotation.x = -Math.PI / 20
+        // weatherSign.rotation.z = -Math.PI / 20
+        // weatherSign.rotation.y = -Math.PI/12
+        aboutTextObj.material = whiteMaterial
+        aboutText = aboutTextObj
+        // raycasterObjects.push(aboutText)
+        scene.add(aboutText)
+        // console.log(scene)
+    }
+    )
+
+let weatherSignBoard
 gltfLoader.load(
     '/models/vertical-sign.glb',
     (gltf) =>
@@ -310,15 +361,15 @@ gltfLoader.load(
     {
         // console.log(gltf.scene.children.length)
         let recipeopleSign = gltf.scene.children[0]
-        recipeopleSign.scale.set(.201, .061, .101)
-        recipeopleSign.position.set(13, 0.5, 6)
+        recipeopleSign.scale.set(.171, .101, .101)
+        recipeopleSign.position.set(13, -1.5, 6)
         // gui.add(recipeopleSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
         // gui.add(recipeopleSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
         // gui.add(recipeopleSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
         recipeopleSign.rotation.x = -0.05
         recipeopleSign.rotation.y = -0.1
         recipeopleSign.rotation.z = -0.26
-        recipeopleSign.material = purpleMaterial
+        recipeopleSign.material = lightPinkMaterial
         recipeopleSignBoard = recipeopleSign
         raycasterObjects.push(recipeopleSignBoard)
         scene.add(recipeopleSignBoard)
@@ -331,14 +382,14 @@ let recipeopleSignWords
 
 
 gltfLoader.load(
-    '/models/one-ten-text.glb',
+    '/models/recipeople-text.glb',
     (gltf) =>
     {
-        console.log(gltf.scene.children.length)
+        // console.log(gltf.scene.children.length)
         let recipeopleSignText = gltf.scene
         recipeopleSignWords = recipeopleSignText
-        recipeopleSignText.scale.set(1.301, 1.301, 1.301)
-        recipeopleSignText.position.set(13.32, 3.2, 6.2)
+        recipeopleSignText.scale.set(1.601, 1.601, 1.601)
+        recipeopleSignText.position.set(14.22, 3.2, 6.4)
         gui.add(recipeopleSignText.rotation, 'x').min(-3).max(3).step(0.001)
         gui.add(recipeopleSignText.rotation, 'y').min(-3).max(3).step(0.001)
         gui.add(recipeopleSignText.rotation, 'z').min(-1).max(1).step(0.001)
@@ -346,11 +397,11 @@ gltfLoader.load(
         recipeopleSignText.rotation.y = -0.27
         recipeopleSignText.rotation.z = 0.08
         recipeopleSignText.children.forEach(child => {
-            child.material = nameMaterial
+            child.material = whiteMaterial
         })
 
         scene.add(recipeopleSignWords)
-        console.log(scene)
+        // console.log(scene)
     }
 )
 
@@ -370,7 +421,7 @@ gltfLoader.load(
         oneTenSign.rotation.x = -0.05
         oneTenSign.rotation.y = 0.1
         oneTenSign.rotation.z = 0.26
-        oneTenSign.material = purpleMaterial
+        oneTenSign.material = redMaterial
         oneTenSignBoard = oneTenSign
         raycasterObjects.push(oneTenSignBoard)
         scene.add(oneTenSignBoard)
@@ -386,7 +437,7 @@ gltfLoader.load(
     '/models/one-ten-text.glb',
     (gltf) =>
     {
-        console.log(gltf.scene.children.length)
+        // console.log(gltf.scene.children.length)
         let oneTenSignText = gltf.scene
         oneTenSignWords = oneTenSignText
         oneTenSignText.scale.set(1.301, 1.301, 1.301)
@@ -402,7 +453,7 @@ gltfLoader.load(
         })
 
         scene.add(oneTenSignWords)
-        console.log(scene)
+        // console.log(scene)
     }
 )
 
@@ -413,7 +464,7 @@ gltfLoader.load(
     '/models/raining-resume-text.glb',
     (gltf) =>
     {
-        console.log(gltf.scene.children.length)
+        // console.log(gltf.scene.children.length)
         let weatherSignText = gltf.scene
         weatherSignWords = weatherSignText
         weatherSignText.scale.set(.008, 1.61, 1.61)
@@ -429,7 +480,7 @@ gltfLoader.load(
         })
 
         scene.add(weatherSignWords)
-        console.log(scene)
+        // console.log(scene)
     }
 )
 
@@ -441,7 +492,7 @@ gltfLoader.load(
     '/models/dijkstra-text.glb',
     (gltf) =>
     {
-        console.log(gltf.scene.children.length)
+        // console.log(gltf.scene.children.length)
         let groggoSignText = gltf.scene
         groggoSignWords = groggoSignText
         groggoSignText.scale.set(1.9, .01, 1.9)
@@ -455,7 +506,7 @@ gltfLoader.load(
         })
 
         scene.add(groggoSignWords)
-        console.log(scene)
+        // console.log(scene)
     }
     )
 
@@ -629,17 +680,17 @@ window.addEventListener('click', () => {
         const scale = object.scale.clone()
         const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
-        console.log(scale)
+        // console.log(scale)
 
         if (scale.x === .261) {
-            console.log(true)
+            // console.log(true)
             for (let i = 0; i < 5; i++) {
                 setTimeout(createResume, 100 * i)
             }
         }
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
-            console.log('lorp')
+            // console.log('lorp')
             const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
             const height = 11 * 2.5
             const width = 8.5 * 2.5
@@ -723,7 +774,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     let resumeTest = (Math.floor(elapsedTime / 2 +  5) % 3 === 0)
     if (prevTest == false && resumeTest == true && !focusedObject) {
-        console.log('drop')
+        // console.log('drop')
         createResume()
         prevTest = true
     } else {
