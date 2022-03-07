@@ -19,19 +19,6 @@ const cannonObjects = []
 let focusedObject, currentIntersect
 
 
-// debugObject.createSphere = () =>
-// {
-//     createSphere(
-//         Math.random() * 8,
-//         {
-//             x: 0,
-//             y: 9,
-//             z: 0
-//         }
-//     )
-// }
-
-// gui.add(debugObject, 'createSphere')
 
 debugObject.createBox = () =>
 {
@@ -52,7 +39,7 @@ debugObject.createResume = () => { createResume() }
 gui.add(debugObject, 'createResume')
 
 // Reset
-debugObject.reset = () =>
+const reset = () =>
 {
     for(const object of cannonObjects)
     {
@@ -97,9 +84,9 @@ const playHitSound = (collision) =>
 {
     const impactStrength = collision.contact.getImpactVelocityAlongNormal()
 
-    if(impactStrength > 4)
+    if(impactStrength > 10)
     {
-        hitSound.volume = Math.random()
+        hitSound.volume = Math.random()/10
         hitSound.currentTime = 0
         hitSound.play()
     }
@@ -110,8 +97,12 @@ const playHitSound = (collision) =>
  */
 const textureLoader = new THREE.TextureLoader()
 const yellowTexture = textureLoader.load('textures/matcaps/toasty-yellow.png')
+const whiteTexture = textureLoader.load('textures/matcaps/whitematcap.png')
+const blackTexture = textureLoader.load('textures/matcaps/black-1.png')
 const cheeseTexture = textureLoader.load('textures/matcaps/cheese.png')
+const chalkboardTexture = textureLoader.load('textures/matcaps/chalkboard.png')
 const pinkTexture = textureLoader.load('textures/matcaps/pink.png')
+const orangeTexture = textureLoader.load('textures/matcaps/orangetoon.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const yellowMaterial = new THREE.MeshMatcapMaterial({
@@ -122,6 +113,21 @@ const nameMaterial = new THREE.MeshMatcapMaterial({
 })
 const pinkMaterial = new THREE.MeshMatcapMaterial({
     matcap: pinkTexture
+})
+const whiteMaterial = new THREE.MeshMatcapMaterial({
+    matcap: whiteTexture
+})
+
+const blackMaterial = new THREE.MeshMatcapMaterial({
+    matcap: blackTexture
+})
+
+const chalkboardMaterial = new THREE.MeshMatcapMaterial({
+    matcap: chalkboardTexture
+})
+
+const orangeMaterial = new THREE.MeshMatcapMaterial({
+    matcap: orangeTexture
 })
 
 
@@ -141,8 +147,8 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     defaultMaterial,
     {
-        friction: 0.1,
-        restitution: 0.02
+        friction: 0.5,
+        restitution: 0.05
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -159,43 +165,6 @@ floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
  * Utils
  */
 
-
-// Create sphere
-// const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
-// const sphereMaterial = new THREE.MeshStandardMaterial({
-//     metalness: 0.3,
-//     roughness: 0.4,
-//     // envMap: environmentMapTexture,
-//     // envMapIntensity: 0.5
-// })
-
-// const createSphere = (radius, position) =>
-// {
-//     // Three.js mesh
-//     const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
-//     mesh.castShadow = true
-//     mesh.scale.set(radius, radius, radius)
-//     mesh.position.copy(position)
-//     scene.add(mesh)
-
-//     // Cannon.js body
-//     const shape = new CANNON.Sphere(radius)
-
-//     const body = new CANNON.Body({
-//         mass: 1,
-//         position: new CANNON.Vec3(0, 3, 0),
-//         shape: shape,
-//         material: defaultMaterial
-//     })
-//     body.position.copy(position)
-//     body.addEventListener('collide', playHitSound)
-//     world.addBody(body)
-
-//     // Save in objects
-//     cannonObjects.push({ mesh, body })
-// }
-
-// Create box
 
 
 
@@ -224,20 +193,22 @@ createPedestal(20, yellowMaterial)
 
 
 gltfLoader.load(
-    '/models/cameron-whiteside.glb',
+    '/models/cameron-whiteside-new.glb',
     (gltf) =>
     {
         let children = gltf.scene.children.slice()
-        let text = children[0]
-        console.log(text)
-        text.scale.set(4.5, 4.5, 4.5)
+        // console.log(children.length)
+        let text = children[1]
+        // console.log(text)
+        text.scale.set(150, 1, 150)
         text.position.set(0, 2.9, 0)
-        text.material = nameMaterial
+        text.material = chalkboardMaterial
+        // console.log(text)
         scene.add(text)
 
         let box = new THREE.Box3()
         box.setFromObject(text)
-        console.log(box.min.x)
+        // console.log(box.min.x)
         let xSize = Math.abs(box.min.x - box.max.x)
         let ySize = Math.abs(box.min.y - box.max.y)
         let zSize = Math.abs(box.min.z - box.max.z)
@@ -246,7 +217,7 @@ gltfLoader.load(
         let zCenter = 0.5 * (box.min.z + box.max.z)
         // let zCenter = 3
         let position = {x: xCenter, y: yCenter, z: zCenter}
-        console.log({ xSize, ySize, zSize, zCenter, yCenter, zCenter })
+        // console.log({ xSize, ySize, zSize, zCenter, yCenter, zCenter })
         const textShape = new CANNON.Box(new CANNON.Vec3(xSize/2, ySize/2, zSize/2))
         const textBody = new CANNON.Body({
             mass: 0,
@@ -268,16 +239,91 @@ gltfLoader.load(
     '/models/extruded-tech-stack-ring.glb',
     (gltf) =>
     {
-        console.log(gltf.scene.children.length)
+        // console.log(gltf.scene.children.length)
         let techStack = gltf.scene.children[0]
-        techStack.scale.set(300, 300, 300)
-        techStack.position.set(0, -10, -20)
-        techStack.material = nameMaterial
+        techStack.scale.set(500, 500, 500)
+        techStack.position.set(0, -7, -50)
+        techStack.material = whiteMaterial
         model = techStack
         scene.add(model)
-        console.log(scene)
+        // console.log(scene)
     }
 )
+
+let weatherSignBoard
+
+gltfLoader.load(
+    '/models/vertical-sign.glb',
+    (gltf) =>
+    {
+        // console.log(gltf.scene.children.length)
+        let weatherSign = gltf.scene.children[0]
+        weatherSign.scale.set(.181, .181, .181)
+        weatherSign.position.set(14, 0, 0)
+        weatherSign.rotation.x = -Math.PI / 20
+        weatherSign.rotation.z = -Math.PI / 20
+        weatherSign.rotation.y = -Math.PI/12
+        weatherSign.material = pinkMaterial
+        weatherSignBoard = weatherSign
+        raycasterObjects.push(weatherSignBoard)
+        scene.add(weatherSignBoard)
+        // console.log(scene)
+    }
+)
+
+
+let groggoSignBoard
+
+gltfLoader.load(
+    '/models/vertical-sign.glb',
+    (gltf) =>
+    {
+        // console.log(gltf.scene.children.length)
+        let groggoSign = gltf.scene.children[0]
+        groggoSign.scale.set(.201, .121, .201)
+        groggoSign.position.set(-15, 5, -6)
+        gui.add(groggoSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        gui.add(groggoSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        gui.add(groggoSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        groggoSign.rotation.x = 0
+        groggoSign.rotation.y = .41
+        groggoSign.rotation.z = .26
+        groggoSign.material = orangeMaterial
+        groggoSignBoard = groggoSign
+        raycasterObjects.push(groggoSignBoard)
+        scene.add(groggoSignBoard)
+        // console.log(scene)
+    }
+)
+
+
+let weatherSignWords
+
+
+gltfLoader.load(
+    '/models/raining-resume-text.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let weatherSignText = gltf.scene
+        weatherSignWords = weatherSignText
+        weatherSignText.scale.set(.008, 1.1, 1.1)
+        weatherSignText.position.set(14, 6.8, 2)
+        // gui.add(weatherSignText.rotation, 'x').min(-10).max(10).step(0.001)
+        // gui.add(weatherSignText.rotation, 'y').min(-10).max(20).step(0.001)
+        // gui.add(weatherSignText.rotation, 'z').min(-35).max(30).step(0.001)
+        weatherSignText.rotation.x = .167
+        weatherSignText.rotation.y = 4.14
+        weatherSignText.rotation.z = 0.44
+        weatherSignText.children.forEach(child => {
+            child.material = nameMaterial
+        })
+
+        scene.add(weatherSignWords)
+        console.log(scene)
+    }
+    )
+
 
 
 
@@ -290,19 +336,18 @@ const createResume = () => {
     const resume = new THREE.Mesh(boxGeometry, resumeMaterial)
     const height = 11/2.5
     const width = 8.5/2.5
-    const depth = 0.1
+    const depth = 0.15
 
     resume.scale.set(...resumeScale)
     // resumeMesh.castShadow = true
     const position =   {
-                    x: (Math.random() - 0.5) * 10,
-                    y: 100 * Math.random()+30,
-                    z: (Math.random() - 0.5) * 10
+                    x: (Math.random() - 0.5) * 12,
+                    y: 40,
+                    z: (Math.random() - 0.5) * 8 + 2
     }
 
     const quaternion = new THREE.Quaternion();
     quaternion.setFromAxisAngle(new THREE.Vector3(Math.random(), Math.random(), Math.random()), Math.random())
-    console.log(quaternion)
 
     // object.mesh.quaternion.copy(object.body.quaternion)
     resume.quaternion.copy(quaternion)
@@ -402,13 +447,13 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(80, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 5, 22)
+const camera = new THREE.PerspectiveCamera(70, sizes.width / sizes.height, 0.1, 1000)
+camera.position.set(-5, 12, 38)
 let pedastal1Origin = new THREE.Vector3(0, 0, 0)
 
-gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
-gui.add(camera.position, 'y').min(-10).max(20).step(0.001)
-gui.add(camera.position, 'z').min(-35).max(30).step(0.001)
+// gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
+// gui.add(camera.position, 'y').min(-10).max(20).step(0.001)
+// gui.add(camera.position, 'z').min(-35).max(30).step(0.001)
 let cameraFocusVector = pedastal1Origin
 
 scene.add(camera)
@@ -433,21 +478,36 @@ window.addEventListener('mousemove', (event) =>
 
 
 window.addEventListener('click', () => {
+
+    if (focusedObject) {
+        focusedObject.body.removeEventListener('collide', playHitSound)
+        world.removeBody(focusedObject.body)
+        // Remove mesh
+            scene.remove(focusedObject.mesh)
+            focusedObject = ''
+    }
     if (currentIntersect) {
         let object = currentIntersect.object;
 
 
         const material = object.material.clone()
-        const geometry = object.geometry.clone()
         const scale = object.scale.clone()
         const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
-        console.log(scale, resumeScale)
-        console.log(scale.x, resumeScale[0])
+
+        console.log(scale)
+
+        if (scale.x === .181) {
+            console.log(true)
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createResume, 100 * i)
+            }
+        }
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
+            console.log('lorp')
             const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
-            const height = 11 * 1.2
-            const width = 8.5 * 1.2
+            const height = 11 * 2.5
+            const width = 8.5 * 2.5
             const depth = 0.1
 
             largeResume.scale.set(width, height, depth)
@@ -455,7 +515,7 @@ window.addEventListener('click', () => {
             const position = {
                 x: 0,
                 y: 3.5,
-                z: 13
+                z: 14
             }
 
             const quaternion = new THREE.Quaternion();
@@ -481,14 +541,15 @@ window.addEventListener('click', () => {
             // raycasterObjects.push(largeResume)
         }
     } else {
-            console.log(`test`)
+
             if (focusedObject) {
-            console.log(`removin`)
+
             focusedObject.body.removeEventListener('collide', playHitSound)
             world.removeBody(focusedObject.body)
             // Remove mesh
-            scene.remove(focusedObject.mesh)
-        }
+                scene.remove(focusedObject.mesh)
+                focusedObject = ''
+            }
 
         }
   })
@@ -520,19 +581,29 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const clock = new THREE.Clock()
 let oldElapsedTime = 0
+let prevTest = false
 
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+    let resumeTest = (Math.floor(elapsedTime / 2 +  5) % 3 === 0)
+    if (prevTest == false && resumeTest == true && !focusedObject) {
+        console.log('drop')
+        createResume()
+        prevTest = true
+    } else {
+        prevTest = resumeTest
+    }
+
     const deltaTime = elapsedTime - oldElapsedTime
     oldElapsedTime = elapsedTime
     if (model) {
-        model.rotation.y = -elapsedTime/10
+        model.rotation.y = -elapsedTime/25
     }
 
 
-    camera.position.x = (cursor.x)*0.5
-    camera.position.y = -(cursor.y)*0.5 + 6
+    camera.position.x = (cursor.x)
+    camera.position.y = -(cursor.y) + 6
     camera.lookAt(cameraFocusVector)
 
     raycaster.setFromCamera(mouse, camera)
@@ -563,7 +634,7 @@ const tick = () =>
         }
 
         for (let intersect of intersects) {
-            if(intersect === intersects[0]) intersect.object.material.color.set('#ffeecc')
+            if(intersect === intersects[0]) intersect.object.material.color.set('#eeddbb')
         }
 
     } else {
