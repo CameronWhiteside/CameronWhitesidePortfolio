@@ -280,14 +280,14 @@ gltfLoader.load(
     {
         // console.log(gltf.scene.children.length)
         let groggoSign = gltf.scene.children[0]
-        groggoSign.scale.set(.201, .121, .201)
-        groggoSign.position.set(-15, 5, -6)
-        gui.add(groggoSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
-        gui.add(groggoSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
-        gui.add(groggoSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
-        groggoSign.rotation.x = 0
-        groggoSign.rotation.y = .41
-        groggoSign.rotation.z = .26
+        groggoSign.scale.set(.201, .171, .201)
+        groggoSign.position.set(-15, 3.5, -6.7)
+        // gui.add(groggoSign.rotation, 'x').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(groggoSign.rotation, 'y').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        // gui.add(groggoSign.rotation, 'z').min(-2 * Math.PI).max(2 * Math.PI).step(0.01)
+        groggoSign.rotation.x = -0.05
+        groggoSign.rotation.y = 0.1
+        groggoSign.rotation.z = 0.26
         groggoSign.material = orangeMaterial
         groggoSignBoard = groggoSign
         raycasterObjects.push(groggoSignBoard)
@@ -308,18 +308,44 @@ gltfLoader.load(
         let weatherSignText = gltf.scene
         weatherSignWords = weatherSignText
         weatherSignText.scale.set(.008, 1.1, 1.1)
-        weatherSignText.position.set(14, 6.8, 2)
-        // gui.add(weatherSignText.rotation, 'x').min(-10).max(10).step(0.001)
-        // gui.add(weatherSignText.rotation, 'y').min(-10).max(20).step(0.001)
-        // gui.add(weatherSignText.rotation, 'z').min(-35).max(30).step(0.001)
-        weatherSignText.rotation.x = .167
-        weatherSignText.rotation.y = 4.14
+        weatherSignText.position.set(14.6, 7.1, 0.1)
+        // gui.add(weatherSignText.rotation, 'x').min(-1).max(1).step(0.001)
+        // gui.add(weatherSignText.rotation, 'y').min(-3).max(3).step(0.001)
+        // gui.add(weatherSignText.rotation, 'z').min(-1).max(1).step(0.001)
+        weatherSignText.rotation.x = .263
+        weatherSignText.rotation.y = -2.015
         weatherSignText.rotation.z = 0.44
         weatherSignText.children.forEach(child => {
             child.material = nameMaterial
         })
 
         scene.add(weatherSignWords)
+        console.log(scene)
+    }
+)
+
+
+let groggoSignWords
+
+
+gltfLoader.load(
+    '/models/dijkstra-text.glb',
+    (gltf) =>
+    {
+        console.log(gltf.scene.children.length)
+        let groggoSignText = gltf.scene
+        groggoSignWords = groggoSignText
+        groggoSignText.scale.set(1.9, .01, 1.9)
+        groggoSignText.position.set(-16.8, 10.2, -6.3)
+
+        groggoSignText.rotation.x = 1.51
+        groggoSignText.rotation.y = .271
+        groggoSignText.rotation.z = -.08
+        groggoSignText.children.forEach(child => {
+        child.material = whiteMaterial
+        })
+
+        scene.add(groggoSignWords)
         console.log(scene)
     }
     )
@@ -448,7 +474,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(70, sizes.width / sizes.height, 0.1, 1000)
-camera.position.set(-5, 12, 38)
+camera.position.set(-5, 12, 30)
 let pedastal1Origin = new THREE.Vector3(0, 0, 0)
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.001)
@@ -557,12 +583,12 @@ window.addEventListener('click', () => {
 
 
 // Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.minDistance = 0;
-// controls.maxDistance = 40;
-// controls.maxPolarAngle = Math.PI/2;
-// controls.minPolarAngle = Math.PI/4.5;
-// controls.enableDamping = true
+const controls = new OrbitControls(camera, canvas)
+controls.minDistance = 15;
+controls.maxDistance = 50;
+controls.maxPolarAngle = Math.PI/2;
+controls.minPolarAngle = Math.PI/4.5;
+controls.enableDamping = true
 
 /**
  * Renderer
