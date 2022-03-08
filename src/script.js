@@ -25,7 +25,7 @@ const loadingManager = new THREE.LoadingManager(
     () =>
     {
         // Wait a little
-        window.setTimeout(() =>
+        setTimeout(() =>
         {
             // Animate overlay
             gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
@@ -35,9 +35,15 @@ const loadingManager = new THREE.LoadingManager(
             loadingBarElement.style.transform = ''
         }, 500)
 
-        window.setTimeout(() => {
+        setTimeout(() => {
             sceneReady = true
         }, 3000)
+
+
+        for (let i = 0; i < 3; i++) {
+            setTimeout(createResume, i * 100 + 4000)
+        }
+
     },
 
     // Progress
@@ -177,6 +183,9 @@ const redTexture = textureLoader.load('textures/matcaps/red-plastic.png')
 const resumeTexture = textureLoader.load('textures/portfolioItems/resume-image.jpg')
 const blueTexture = textureLoader.load('textures/matcaps/blue.png')
 const greenTexture = textureLoader.load('textures/matcaps/green.png')
+const beigeTexture = textureLoader.load('textures/matcaps/beige.png')
+const nickelTexture = textureLoader.load('textures/matcaps/nickel.png')
+
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
 const yellowMaterial = new THREE.MeshMatcapMaterial({
     matcap: yellowTexture
@@ -225,6 +234,14 @@ const lightPinkMaterial = new THREE.MeshMatcapMaterial({
     matcap: lightPinkTexture
 })
 
+const beigeMaterial = new THREE.MeshMatcapMaterial({
+    matcap: beigeTexture
+})
+
+const nickelMaterial = new THREE.MeshMatcapMaterial({
+    matcap: nickelTexture
+})
+
 
 
 
@@ -234,7 +251,7 @@ const lightPinkMaterial = new THREE.MeshMatcapMaterial({
 const world = new CANNON.World()
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
-world.gravity.set(0, -28, 0)
+world.gravity.set(0, -25, 0)
 
 // Default material
 const defaultMaterial = new CANNON.Material('default')
@@ -385,13 +402,13 @@ gltfLoader.load(
 let aboutText
 //about text
 gltfLoader.load(
-    '/models/about-text.glb',
+    '/models/about-text-2.glb',
     (gltf) =>
     {
         // console.log(gltf.scene.children.length)
         let aboutTextObj = gltf.scene.children[1]
-        aboutTextObj.scale.set(35, 35, 35)
-        aboutTextObj.position.set(0, -2.5, 10.1)
+        aboutTextObj.scale.set(180, 180, 180)
+        aboutTextObj.position.set(0, -2.7, 10.1)
         // weatherSign.rotation.x = -Math.PI / 20
         // weatherSign.rotation.z = -Math.PI / 20
         // weatherSign.rotation.y = -Math.PI/12
@@ -485,7 +502,7 @@ gltfLoader.load(
         let recipeopleSignText = gltf.scene
         recipeopleSignWords = recipeopleSignText
         recipeopleSignText.scale.set(1.601, 1.601, 1.601)
-        recipeopleSignText.position.set(14.22, 3.2, 6.4)
+        recipeopleSignText.position.set(14.12, 3.2, 6.4)
         // gui.add(recipeopleSignText.rotation, 'x').min(-3).max(3).step(0.001)
         // gui.add(recipeopleSignText.rotation, 'y').min(-3).max(3).step(0.001)
         // gui.add(recipeopleSignText.rotation, 'z').min(-1).max(1).step(0.001)
@@ -493,7 +510,7 @@ gltfLoader.load(
         recipeopleSignText.rotation.y = -0.27
         recipeopleSignText.rotation.z = 0.08
         recipeopleSignText.children.forEach(child => {
-            child.material = whiteMaterial
+            child.material = redMaterial
         })
 
         scene.add(recipeopleSignWords)
@@ -588,7 +605,6 @@ gltfLoader.load(
     '/models/dijkstra-text.glb',
     (gltf) =>
     {
-        // console.log(gltf.scene.children.length)
         let groggoSignText = gltf.scene
         groggoSignWords = groggoSignText
         groggoSignText.scale.set(1.9, .01, 1.9)
@@ -598,7 +614,7 @@ gltfLoader.load(
         groggoSignText.rotation.y = .271
         groggoSignText.rotation.z = -.08
         groggoSignText.children.forEach(child => {
-        child.material = whiteMaterial
+        child.material = redMaterial
         })
 
         scene.add(groggoSignWords)
@@ -606,32 +622,27 @@ gltfLoader.load(
     }
     )
 
-
-
-
-
-const resumeScale = [8.5 / 2.5, 11/ 2.5, 0.1]
+const resumeScale = [8.5 / 2.5, 11/ 2.5, 0.15]
 
 const createResume = () => {
 
     const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
     const resume = new THREE.Mesh(boxGeometry, resumeMaterial)
-    const height = 11/2.5
-    const width = 8.5/2.5
-    const depth = 0.15
+    const height = resumeScale[1]
+    const width = resumeScale[0]
+    const depth = resumeScale[2]
 
     resume.scale.set(...resumeScale)
-    // resumeMesh.castShadow = true
+
     const position =   {
                     x: (Math.random() - 0.5) * 12,
-                    y: 40,
+                    y: 50,
                     z: (Math.random() - 0.5) * 8 + 2
     }
 
     const quaternion = new THREE.Quaternion();
     quaternion.setFromAxisAngle(new THREE.Vector3(Math.random(), Math.random(), Math.random()), Math.random())
 
-    // object.mesh.quaternion.copy(object.body.quaternion)
     resume.quaternion.copy(quaternion)
     resume.position.copy(position)
 
@@ -719,8 +730,8 @@ window.addEventListener('resize', () =>
     // Update camera
     camera.aspect = sizes.width / sizes.height
     console.log(camera.aspect)
-    camera.position.z = 40 - camera.aspect * 9
-    camera.fov = 105 - window.innerWidth / window.innerHeight * 12
+    camera.position.z = Math.max(40 - camera.aspect * 9, 20)
+    camera.fov = Math.max(105 - window.innerWidth / window.innerHeight * 12, 10)
     camera.updateProjectionMatrix()
 
     // Update renderer
@@ -824,42 +835,7 @@ window.addEventListener('click', () => {
         const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
-            // console.log('lorp')
             window.open('https://drive.google.com/file/d/1s1uBYYcPuPqNzedr_LpXSohZyVJ6aMNv/view')
-            // const largeResume = new THREE.Mesh(boxGeometry, resumeMaterial)
-            // const height = 11 * 2.5
-            // const width = 8.5 * 2.5
-            // const depth = 0.1
-
-            // largeResume.scale.set(width, height, depth)
-
-            // const position = {
-            //     x: 0,
-            //     y: 3.5,
-            //     z: 14
-            // }
-
-            // const quaternion = new THREE.Quaternion();
-            // quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/15)
-            // largeResume.quaternion.copy(quaternion)
-            // largeResume.position.copy(position)
-
-            // const resumeShape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-            // const resumeBody = new CANNON.Body({
-            //     mass: 0,
-            //     shape: resumeShape,
-            //     material: defaultMaterial
-            // })
-
-            // resumeBody.position.copy(position)
-            // resumeBody.quaternion.copy(quaternion)
-            // resumeBody.addEventListener('collide', playHitSound)
-
-            // scene.add(largeResume)
-            // focusedObject = { mesh: largeResume, body: resumeBody }
-            // world.addBody(resumeBody)
-            // cannonObjects.push({ mesh: largeResume, body: resumeBody })
-            // raycasterObjects.push(largeResume)
         }
 
     }
@@ -893,19 +869,14 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 let RenderTargetClass = null
 
-if(renderer.getPixelRatio() === 1 && renderer.capabilities.isWebGL2)
-{
+if (renderer.getPixelRatio() === 1 && renderer.capabilities.isWebGL2) {
     RenderTargetClass = THREE.WebGLMultisampleRenderTarget
-    console.log('Using WebGLMultisampleRenderTarget')
 }
-else
-{
+else {
     RenderTargetClass = THREE.WebGLRenderTarget
-    console.log('Using WebGLRenderTarget')
 }
 
 const renderTarget = new RenderTargetClass(
-
 
     800,
     600,
@@ -940,12 +911,12 @@ const clock = new THREE.Clock()
 let oldElapsedTime = 0
 let prevTest = false
 
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
     let resumeTest = (Math.floor(elapsedTime / 2 +  5) % 3 === 0)
     if (prevTest == false && resumeTest == true && !focusedObject) {
-        // console.log('drop')
         createResume()
         prevTest = true
     } else {
@@ -960,12 +931,10 @@ const tick = () =>
 
 
     camera.position.x = (cursor.x)
-    // camera.position.y = -(cursor.y) + 8
+    // camera.position.y = -(cursor.y) + 6
     camera.lookAt(cameraFocusVector)
 
     raycaster.setFromCamera(mouse, camera)
-    // let raycasterTests = console.log(cannonObjects.m)
-    // const intersects = raycaster.intersectObjects(cannonObjects)
 
     // Update physics
     world.step(1 / 60, deltaTime, 3)

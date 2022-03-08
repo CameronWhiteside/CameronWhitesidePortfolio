@@ -53,8 +53,8 @@ body{
 
 .popup{
     position: absolute;
-    width: 600px;
-    max-width: 80vw;
+    width: 620px;
+    max-width: 70vw;
     height: 700px;
     left: calc(50% - 300px);
     top: calc(50% - 350px);
@@ -238,9 +238,10 @@ a{
   }
 
 
-@media only screen and (max-width: 748px) {
+@media only screen and (max-width: 1000px)
+ {
     .popup, #recipeople.popup{
-        left: calc(50% - 40vw);
+        left: calc(50% - 35vw);
         top: calc(50% - 150px);
         height: fit-content;
         max-height: 80vh;
@@ -277,7 +278,7 @@ a{
     }
 
     #groggo > h1{
-        font-size: 5.5vw;
+        font-size: 4.2vw;
         margin-bottom: 5px;
     }
 
