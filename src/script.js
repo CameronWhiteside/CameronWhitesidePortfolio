@@ -835,7 +835,7 @@ window.addEventListener('click', () => {
         const resumeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture })
 
         if (material.map === resumeMaterial.map && scale.x === resumeScale[0]) {
-            window.open('https://drive.google.com/file/d/1s1uBYYcPuPqNzedr_LpXSohZyVJ6aMNv/view')
+            window.open('https://drive.google.com/file/d/1kBxhgSp2KpjXae9yqO8nxEuEzuSIidlU/view')
         }
 
     }
