@@ -399,26 +399,26 @@ gltfLoader.load(
 )
 
 
-let aboutText
-//about text
-gltfLoader.load(
-    '/models/about-text-2.glb',
-    (gltf) =>
-    {
-        // console.log(gltf.scene.children.length)
-        let aboutTextObj = gltf.scene.children[1]
-        aboutTextObj.scale.set(180, 180, 180)
-        aboutTextObj.position.set(0, -2.7, 10.1)
-        // weatherSign.rotation.x = -Math.PI / 20
-        // weatherSign.rotation.z = -Math.PI / 20
-        // weatherSign.rotation.y = -Math.PI/12
-        aboutTextObj.material = durpleMaterial
-        aboutText = aboutTextObj
-        // raycasterObjects.push(aboutText)
-        scene.add(aboutText)
-        // console.log(scene)
-    }
-    )
+// let aboutText
+// //about text
+// gltfLoader.load(
+//     '/models/about-text-2.glb',
+//     (gltf) =>
+//     {
+//         // console.log(gltf.scene.children.length)
+//         let aboutTextObj = gltf.scene.children[1]
+//         aboutTextObj.scale.set(180, 180, 180)
+//         aboutTextObj.position.set(0, -2.7, 10.1)
+//         // weatherSign.rotation.x = -Math.PI / 20
+//         // weatherSign.rotation.z = -Math.PI / 20
+//         // weatherSign.rotation.y = -Math.PI/12
+//         aboutTextObj.material = durpleMaterial
+//         aboutText = aboutTextObj
+//         // raycasterObjects.push(aboutText)
+//         scene.add(aboutText)
+//         // console.log(scene)
+//     }
+//     )
 
 let weatherSignBoard
 gltfLoader.load(
